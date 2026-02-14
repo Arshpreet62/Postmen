@@ -4,6 +4,13 @@ import React, { useState, useEffect } from "react";
 import { useGlobal } from "../Layout/context/Context";
 import ResponseShowcase from "./ResponseDisplay";
 import { apiUrl } from "../../config/api";
+import {
+  FaEye,
+  FaTrash,
+  FaChevronLeft,
+  FaChevronRight,
+  FaTimes,
+} from "react-icons/fa";
 
 interface RequestHistoryItem {
   _id: string;
@@ -54,7 +61,7 @@ const RequestHistory: React.FC = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        apiUrl(`/api/history?page=${page}&limit=10`),
+        apiUrl(`/api/history?page=${page}&limit=9`),
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -77,6 +84,7 @@ const RequestHistory: React.FC = () => {
   };
 
   const deleteRequest = async (requestId: string) => {
+    if (!confirm("Delete this request from history?")) return;
     if (!token) return;
     try {
       const response = await fetch(apiUrl(`/api/history/${requestId}`), {
@@ -120,25 +128,25 @@ const RequestHistory: React.FC = () => {
   };
 
   const getStatusColor = (status: number) => {
-    if (status >= 200 && status < 300) return "text-green-600";
-    if (status >= 400 && status < 500) return "text-yellow-600";
-    if (status >= 500) return "text-red-600";
-    return "text-gray-600";
+    if (status >= 200 && status < 300)
+      return "bg-green-500/10 text-green-600 border-green-200 dark:border-green-800";
+    if (status >= 400 && status < 500)
+      return "bg-yellow-500/10 text-yellow-600 border-yellow-200 dark:border-yellow-800";
+    if (status >= 500)
+      return "bg-red-500/10 text-red-600 border-red-200 dark:border-red-800";
+    return "bg-slate-500/10 text-slate-600";
   };
 
   const getMethodColor = (method: string) => {
-    switch (method) {
-      case "GET":
-        return "bg-blue-100 text-blue-800";
-      case "POST":
-        return "bg-green-100 text-green-800";
-      case "PUT":
-        return "bg-yellow-100 text-yellow-800";
-      case "DELETE":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
+    const colors: Record<string, string> = {
+      GET: "bg-blue-500/10 text-blue-600 border-blue-200 dark:border-blue-800",
+      POST: "bg-green-500/10 text-green-600 border-green-200 dark:border-green-800",
+      PUT: "bg-yellow-500/10 text-yellow-600 border-yellow-200 dark:border-yellow-800",
+      DELETE: "bg-red-500/10 text-red-600 border-red-200 dark:border-red-800",
+      PATCH:
+        "bg-purple-500/10 text-purple-600 border-purple-200 dark:border-purple-800",
+    };
+    return colors[method] || "bg-slate-500/10 text-slate-600";
   };
 
   useEffect(() => {
@@ -147,139 +155,219 @@ const RequestHistory: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
+      <div className="flex items-center justify-center py-12">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+          <p className="text-slate-600 dark:text-slate-400">
+            Loading history...
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">Request History</h2>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+            Request History
+          </h2>
+          <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+            {pagination?.totalRequests || 0} total requests
+          </p>
+        </div>
         {history.length > 0 && (
           <button
             onClick={clearAllHistory}
-            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium text-sm transition-colors"
           >
-            Clear All History
+            Clear All
           </button>
         )}
       </div>
 
+      {/* Empty State */}
       {history.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500 text-lg">No request history found</p>
-          <p className="text-gray-400 text-sm mt-2">
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="text-6xl mb-4">📋</div>
+          <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
+            No request history yet
+          </h3>
+          <p className="text-slate-600 dark:text-slate-400">
             Make some API requests to see them here
           </p>
         </div>
       ) : (
         <>
-          <ul className="bg-white shadow rounded-md divide-y divide-gray-200">
+          {/* Grid of Request Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {history.map((req) => (
-              <li
+              <div
                 key={req._id}
-                className="px-6 py-4 flex justify-between items-center hover:bg-gray-50"
+                className="group glass rounded-xl p-5 border border-white/20 hover:border-indigo-300/50 hover:shadow-lg transition-all duration-300 cursor-pointer"
+                onClick={() => setSelectedRequest(req)}
               >
-                <div className="flex items-center space-x-4">
+                {/* Method & Status Badges */}
+                <div className="flex items-start justify-between mb-3">
                   <span
-                    className={`px-2 py-0.5 rounded-full text-xs font-semibold ${getMethodColor(
-                      req.method,
-                    )}`}
+                    className={`${getMethodColor(req.method)} px-3 py-1 rounded-full text-xs font-bold border`}
                   >
                     {req.method}
                   </span>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900 truncate max-w-md">
-                      {req.endpoint}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {new Date(req.timestamp).toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-4">
                   <span
-                    className={`text-sm font-medium ${getStatusColor(
-                      req.response.status,
-                    )}`}
+                    className={`${getStatusColor(req.response.status)} px-3 py-1 rounded-full text-xs font-bold border`}
                   >
                     {req.response.status}
                   </span>
+                </div>
+
+                {/* URL */}
+                <div className="mb-3">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">
+                    Endpoint
+                  </p>
+                  <p className="text-sm font-mono text-slate-900 dark:text-white truncate hover:text-clip">
+                    {req.endpoint.split("/").slice(2).join("/").slice(0, 30)}
+                    ...
+                  </p>
+                </div>
+
+                {/* Timestamp */}
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    {new Date(req.timestamp).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                </div>
+
+                {/* Action Buttons - Show on Hover */}
+                <div className="flex gap-2 mt-4 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
-                    onClick={() => setSelectedRequest(req)}
-                    className="text-indigo-600 hover:text-indigo-900 text-sm font-medium"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedRequest(req);
+                    }}
+                    className="flex-1 flex items-center justify-center gap-2 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors"
                   >
+                    <FaEye size={14} />
                     View
                   </button>
                   <button
-                    onClick={() => deleteRequest(req._id)}
-                    className="text-red-600 hover:text-red-900 text-sm font-medium"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteRequest(req._id);
+                    }}
+                    className="flex-1 flex items-center justify-center gap-2 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
                   >
+                    <FaTrash size={14} />
                     Delete
                   </button>
                 </div>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
 
+          {/* Pagination */}
           {pagination && pagination.totalPages > 1 && (
-            <div className="flex justify-center space-x-2 mt-4">
+            <div className="flex items-center justify-center gap-2 mt-8">
               <button
-                onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-1 rounded bg-gray-200 disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                Previous
+                <FaChevronLeft size={16} />
               </button>
-              <span className="px-3 py-1 rounded bg-gray-100 text-gray-700">
-                Page {pagination.currentPage} of {pagination.totalPages}
-              </span>
+
+              <div className="flex items-center gap-1">
+                {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
+                  .slice(0, 5)
+                  .map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`w-10 h-10 rounded-lg font-medium transition-all ${
+                        currentPage === page
+                          ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white"
+                          : "border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                {pagination.totalPages > 5 && (
+                  <span className="text-slate-600 dark:text-slate-400 px-2">
+                    ...
+                  </span>
+                )}
+              </div>
+
               <button
                 onClick={() =>
-                  setCurrentPage((p) => Math.min(p + 1, pagination.totalPages))
+                  setCurrentPage(
+                    Math.min(pagination.totalPages, currentPage + 1),
+                  )
                 }
                 disabled={currentPage === pagination.totalPages}
-                className="px-3 py-1 rounded bg-gray-200 disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                Next
+                <FaChevronRight size={16} />
               </button>
             </div>
           )}
         </>
       )}
 
+      {/* Modal */}
       {selectedRequest && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-2/3 shadow-lg rounded-md bg-white max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-gray-900">
-                Request Details
-              </h3>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="glass rounded-2xl border border-white/20 max-w-2xl w-full max-h-96 overflow-y-auto shadow-2xl">
+            {/* Header */}
+            <div className="sticky top-0 flex items-center justify-between p-6 border-b border-white/20 bg-white/50 dark:bg-slate-900/50 backdrop-blur">
+              <div className="flex items-center gap-4">
+                <span
+                  className={`${getMethodColor(selectedRequest.method)} px-3 py-1 rounded-full text-sm font-bold border`}
+                >
+                  {selectedRequest.method}
+                </span>
+                <span
+                  className={`${getStatusColor(selectedRequest.response.status)} px-3 py-1 rounded-full text-sm font-bold border`}
+                >
+                  {selectedRequest.response.status}
+                </span>
+              </div>
               <button
                 onClick={() => setSelectedRequest(null)}
-                className="text-gray-400 hover:text-gray-600"
+                className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors"
               >
-                ✕
+                <FaTimes size={20} />
               </button>
             </div>
-            <ResponseShowcase
-              request={{
-                url: selectedRequest.endpoint,
-                method: selectedRequest.method,
-                headers: normalizeHeaders(selectedRequest.request.headers),
-                body: selectedRequest.request.body
-                  ? JSON.stringify(selectedRequest.request.body, null, 2)
-                  : "",
-              }}
-              response={{
-                status: selectedRequest.response.status,
-                statusText: selectedRequest.response.statusText,
-                headers: normalizeHeaders(selectedRequest.response.headers),
-                body: selectedRequest.response.body,
-              }}
-            />
+
+            {/* Content */}
+            <div className="p-6">
+              <ResponseShowcase
+                request={{
+                  url: selectedRequest.endpoint,
+                  method: selectedRequest.method,
+                  headers: normalizeHeaders(selectedRequest.request.headers),
+                  body: selectedRequest.request.body
+                    ? JSON.stringify(selectedRequest.request.body, null, 2)
+                    : "",
+                }}
+                response={{
+                  status: selectedRequest.response.status,
+                  statusText: selectedRequest.response.statusText,
+                  headers: normalizeHeaders(selectedRequest.response.headers),
+                  body: selectedRequest.response.body,
+                }}
+              />
+            </div>
           </div>
         </div>
       )}

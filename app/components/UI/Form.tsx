@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useGlobal } from "../Layout/context/Context";
 import { apiUrl } from "../../config/api";
+import { FaPlus, FaTrash, FaCheckCircle } from "react-icons/fa";
 
 export default function Form() {
   type Header = {
@@ -18,11 +19,27 @@ export default function Form() {
   const [headersValue, setHeadersValue] = useState("");
   const [urlerror, setUrlerror] = useState("");
   const [requestError, setRequestError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const methods = ["GET", "POST", "PUT", "DELETE", "PATCH"];
+
+  const methodColors: Record<string, string> = {
+    GET: "bg-blue-500/20 text-blue-600 border-blue-200",
+    POST: "bg-green-500/20 text-green-600 border-green-200",
+    PUT: "bg-yellow-500/20 text-yellow-600 border-yellow-200",
+    DELETE: "bg-red-500/20 text-red-600 border-red-200",
+    PATCH: "bg-purple-500/20 text-purple-600 border-purple-200",
+  };
 
   const addMoreHeaders = () => {
-    setHeaders([...headers, { key: headersKey, value: headersValue }]);
-    setHeadersKey("");
-    setHeadersValue("");
+    if (headersKey.trim() && headersValue.trim()) {
+      setHeaders([
+        ...headers,
+        { key: headersKey.trim(), value: headersValue.trim() },
+      ]);
+      setHeadersKey("");
+      setHeadersValue("");
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -31,22 +48,29 @@ export default function Form() {
       new URL(url);
       setUrlerror("");
     } catch {
-      setUrlerror("Invalid URL");
+      setUrlerror("Please enter a valid URL");
       return;
     }
+
     const finalHeaders = [...headers];
-    const trimmedkey = headersKey.trim();
-    const trimmedValue = headersValue.trim();
-    if (trimmedkey && trimmedValue) {
-      finalHeaders.push({ key: trimmedkey, value: trimmedValue });
+    if (headersKey.trim() && headersValue.trim()) {
+      finalHeaders.push({ key: headersKey.trim(), value: headersValue.trim() });
     }
 
-    const check = finalHeaders.some((header) => header.key === "Content-Type");
-
+    const check = finalHeaders.some(
+      (header) => header.key.toLowerCase() === "content-type",
+    );
     if (!check && method !== "GET") {
       finalHeaders.push({ key: "Content-Type", value: "application/json" });
     }
 
+    // Convert headers array to object
+    const headersObject: Record<string, string> = {};
+    finalHeaders.forEach((h) => {
+      headersObject[h.key] = h.value;
+    });
+
+    setLoading(true);
     try {
       const response = await fetch(apiUrl("/api/request"), {
         method: "POST",
@@ -58,7 +82,7 @@ export default function Form() {
           url,
           method,
           headers: finalHeaders,
-          body,
+          body: method === "GET" ? null : body,
         }),
       });
 
@@ -66,19 +90,14 @@ export default function Form() {
 
       setResponseData({
         request: {
-          url: result.request.url,
-          method: result.request.method,
-          headers: result.request.headers,
-          body: result.request.body,
+          url,
+          method,
+          headers: headersObject,
+          body: method === "GET" ? "" : body,
         },
-        response: {
-          status: result.response.status,
-          statusText: result.response.statusText,
-          headers: result.response.headers,
-          body: result.response.body,
-        },
-        savedToHistory: result.savedToHistory,
+        response: result,
       });
+
       setHeaders([]);
       setHeadersKey("");
       setHeadersValue("");
@@ -88,155 +107,215 @@ export default function Form() {
     } catch (error) {
       console.error("Request failed:", error);
       setRequestError("Failed to send request. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <form
-      className="flex w-100 justify-center items-center bg-white shadow-lg p-4 rounded-lg"
-      onSubmit={handleSubmit}
-    >
-      <div className="flex flex-col gap-3 rounded-md justify-center border-2 border-black/30 h-full w-full px-3 py-2 relative">
-        {requestError.length > 0 && (
-          <div className="flex w-full h-full flex-col gap-3 items-center justify-center absolute top-0 right-0 bg-white z-10">
-            <p className="text-center font-medium text-red-500 text-3xl">
-              {requestError}
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Error Alert */}
+      {(urlerror || requestError) && (
+        <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/30 flex items-start gap-3">
+          <span className="text-red-500 text-xl mt-1">⚠️</span>
+          <div>
+            <p className="font-semibold text-red-700 dark:text-red-400">
+              {urlerror ? "Invalid URL" : "Request Failed"}
             </p>
+            <p className="text-sm text-red-600 dark:text-red-300">
+              {urlerror || requestError}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setUrlerror("");
+              setRequestError("");
+            }}
+            className="ml-auto text-red-500 hover:text-red-700 text-xl"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* URL Input */}
+      <div className="space-y-2">
+        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+          Request URL
+        </label>
+        <input
+          type="text"
+          value={url}
+          placeholder="https://api.example.com/users"
+          className="w-full input-smooth px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+          onChange={(e) => {
+            setUrl(e.target.value);
+            setUrlerror("");
+          }}
+        />
+      </div>
+
+      {/* Method & Headers Row */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {/* Method Selector */}
+        <div className="space-y-2">
+          <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+            Method
+          </label>
+          <div className="grid grid-cols-2 gap-2">
+            {methods.map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setMethod(m)}
+                className={`py-2 px-3 rounded-lg font-semibold text-sm transition-all border ${
+                  method === m
+                    ? "bg-indigo-600 text-white border-indigo-600 scale-105"
+                    : methodColors[m]
+                }`}
+              >
+                {m}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Quick Templates */}
+        <div className="md:col-span-3 space-y-2">
+          <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+            Quick Templates
+          </label>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
             <button
               type="button"
-              className="px-2 py-1 rounded-md bg-blue-500/90 text-xl font-bold text-white"
-              onClick={() => setRequestError("")}
+              onClick={() =>
+                setUrl("https://jsonplaceholder.typicode.com/posts")
+              }
+              className="px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg text-sm font-medium transition-colors"
+            >
+              JSONPlaceholder
+            </button>
+            <button
+              type="button"
+              onClick={() => setUrl("https://api.github.com/users/github")}
+              className="px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg text-sm font-medium transition-colors"
+            >
+              GitHub API
+            </button>
+            <button
+              type="button"
+              onClick={() => setUrl("")}
+              className="px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg text-sm font-medium transition-colors"
             >
               Clear
             </button>
           </div>
-        )}
-        <div className="flex gap-1 justify-between items-center w-full">
-          <h3 className="flex items-center gap-2 text-nowrap text-xl font-bold text-blue-600/90">
-            URL
-            <span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="size-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"
-                />
-              </svg>
-            </span>
-          </h3>
-          <input
-            type="text"
-            value={url}
-            className="w-60 rounded-md border-2 border-black/30 p-2 overflow-auto bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="enter your url"
-            onChange={(e) => setUrl(e.target.value)}
-          />
         </div>
+      </div>
 
-        {urlerror.length > 0 && <p className="text-red-500">{urlerror}</p>}
-        <div className="flex gap-2 items-center justify-between w-full">
-          <h3 className="text-nowrap text-xl font-bold text-blue-600/90">
-            Method
+      {/* Headers Section */}
+      {method !== "GET" && (
+        <div className="space-y-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50">
+          <h3 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+            Headers
           </h3>
-          <select
-            name="method"
-            id="method"
-            value={method}
-            className="px-2 py-2 w-60 border-2 border-black/30 rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onChange={(e) => setMethod(e.target.value)}
-          >
-            <option value="GET">GET</option>
-            <option value="POST">POST</option>
-            <option value="PUT">PUT</option>
-            <option value="DELETE">DELETE</option>
-          </select>
-        </div>
 
-        {method !== "GET" && (
-          <>
-            <h3 className="text-xl text-center font-medium text-black/75">
-              Headers
-            </h3>
-            <div className="flex flex-col gap-2 items-center justify-center w-full">
-              <input
-                type="text"
-                placeholder="key"
-                value={headersKey}
-                className="w-full rounded-md border-2 border-black/30 p-2 overflow-auto bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                onChange={(e) => setHeadersKey(e.target.value)}
-              />
-              <input
-                type="text"
-                placeholder="value"
-                value={headersValue}
-                className="w-full rounded-md border-2 border-black/30 p-2 overflow-auto bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                onChange={(e) => setHeadersValue(e.target.value)}
-              />
-            </div>
+          {/* Add Header */}
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
+            <input
+              type="text"
+              placeholder="Header name"
+              value={headersKey}
+              className="md:col-span-2 input-smooth px-4 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 text-sm"
+              onChange={(e) => setHeadersKey(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Header value"
+              value={headersValue}
+              className="md:col-span-2 input-smooth px-4 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 text-sm"
+              onChange={(e) => setHeadersValue(e.target.value)}
+            />
             <button
-              className="px-2 py-1 rounded-md bg-blue-500/90 hover:bg-blue-600/90 text-xl font-bold text-white"
               type="button"
               onClick={addMoreHeaders}
-              disabled={!headersKey || !headersValue}
+              disabled={!headersKey.trim() || !headersValue.trim()}
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
-              ADD MORE
+              <FaPlus size={16} />
+              <span className="hidden sm:inline">Add</span>
             </button>
-            <ul className="flex flex-col gap-2 items-center justify-center w-full">
+          </div>
+
+          {/* Headers List */}
+          {headers.length > 0 && (
+            <div className="space-y-2">
+              <div className="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
+                Added Headers ({headers.length})
+              </div>
               {headers.map((header, index) => (
-                <li
+                <div
                   key={index}
-                  className="flex w-full h-10 items-center justify-between gap-2"
+                  className="flex items-center gap-2 p-3 bg-white dark:bg-slate-700 rounded-lg border border-slate-200 dark:border-slate-600"
                 >
-                  <div
-                    className="w-[35%] h-full flex items-center px-2 text-start border-2 border-black/30 rounded-md overflow-x-auto whitespace-nowrap hide-scrollbar"
-                    title={header.key}
-                  >
-                    {header.key}
-                  </div>
-                  <span className="text-xl">:</span>
-                  <div
-                    className="w-[35%] h-full flex items-center px-2 text-start border-2 border-black/30 rounded-md overflow-x-auto whitespace-nowrap hide-scrollbar"
-                    title={header.value}
-                  >
-                    {header.value}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
+                      {header.key}
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                      {header.value}
+                    </p>
                   </div>
                   <button
                     type="button"
-                    className="px-3 py-1 rounded-md bg-red-500 hover:bg-red-600 text-white font-semibold transition"
                     onClick={() =>
                       setHeaders(headers.filter((_, i) => i !== index))
                     }
+                    className="p-2 hover:bg-red-500/10 text-red-600 rounded-lg transition-colors"
                   >
-                    Delete
+                    <FaTrash size={16} />
                   </button>
-                </li>
+                </div>
               ))}
-            </ul>
-            <h3 className="text-xl text-center font-medium text-black/75">
-              Body
-            </h3>
-            <textarea
-              placeholder="enter your body"
-              className="w-full h-40 rounded-md border-2 border-black/30 p-2 overflow-auto bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-            />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Body Input */}
+      {method !== "GET" && (
+        <div className="space-y-2">
+          <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+            Request Body (JSON)
+          </label>
+          <textarea
+            placeholder={`{\n  "key": "value",\n  "name": "example"\n}`}
+            className="w-full input-smooth px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 font-mono text-sm h-32 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500/20 resize-none"
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+          />
+        </div>
+      )}
+
+      {/* Submit Button */}
+      <button
+        type="submit"
+        disabled={loading || !url}
+        className="w-full btn-gradient py-4 text-white font-semibold rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 text-lg"
+      >
+        {loading ? (
+          <>
+            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            Sending...
+          </>
+        ) : (
+          <>
+            <FaCheckCircle size={18} />
+            Send Request
           </>
         )}
-        <button
-          className="px-2 py-1 rounded-md bg-blue-500/90 hover:bg-blue-600/90 text-xl font-bold text-white"
-          type="submit"
-        >
-          Send
-        </button>
-      </div>
+      </button>
     </form>
   );
 }

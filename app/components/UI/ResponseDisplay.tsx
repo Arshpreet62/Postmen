@@ -1,19 +1,27 @@
 "use client";
 
 import React, { useState } from "react";
+import {
+  FaCheckCircle,
+  FaCopy,
+  FaChevronDown,
+  FaChevronUp,
+} from "react-icons/fa";
 
 export type RequestData = {
   url: string;
   method: string;
-  headers: Record<string, string>;
+  headers: Record<string, string> | Array<{ key: string; value: string }>;
   body: string;
 };
 
 export type ResponseData = {
   status: number;
-  statusText: string;
+  statusText?: string;
   headers: Record<string, string>;
   body: any;
+  timing?: number;
+  size?: number;
   savedToHistory?: boolean;
 };
 
@@ -24,19 +32,34 @@ type Props = {
 
 const ResponseShowcase: React.FC<Props> = ({ request, response }) => {
   const [copied, setCopied] = useState(false);
+  const [expandedSections, setExpandedSections] = useState({
+    headers: false,
+    body: true,
+  });
 
   if (!request || !response) return null;
 
-  const formattedHeaders = Object.entries(response.headers).map(
-    ([key, value]) => `${key}: ${value}`,
-  );
+  const isSuccess = response.status >= 200 && response.status < 300;
+  const isClientError = response.status >= 400 && response.status < 500;
+  const isServerError = response.status >= 500;
+
+  const statusColor = isSuccess
+    ? "bg-green-500/20 text-green-600 border-green-200"
+    : isClientError
+      ? "bg-yellow-500/20 text-yellow-600 border-yellow-200"
+      : isServerError
+        ? "bg-red-500/20 text-red-600 border-red-200"
+        : "bg-slate-500/20 text-slate-600 border-slate-200";
+
+  const headers = Array.isArray(request.headers)
+    ? Object.fromEntries(request.headers.map((h) => [h.key, h.value]))
+    : request.headers;
 
   const generatedFetchCode = () => {
     const method = request.method;
-    const headers = request.headers || null;
     const body =
       method !== "GET" && request.body
-        ? `body: JSON.stringify(${JSON.stringify(request.body, null, 2)})`
+        ? `body: JSON.stringify(${JSON.stringify(JSON.parse(request.body || "{}"), null, 2)})`
         : "";
 
     return `fetch("${request.url}", {
@@ -58,55 +81,131 @@ const ResponseShowcase: React.FC<Props> = ({ request, response }) => {
     });
   };
 
-  return (
-    <div className="mt-6 space-y-6">
-      <div className="p-4 bg-gray-800 rounded-xl text-white shadow">
-        <div className="flex items-center justify-between h-20">
-          <div>
-            <h2 className="text-lg font-bold mb-2">Response</h2>
-            <p>
-              Status: {response.status} {response.statusText}
-            </p>
-          </div>
+  const toggleSection = (section: keyof typeof expandedSections) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
+  };
 
+  return (
+    <div className="space-y-6">
+      {/* Response Status Card */}
+      <div className={`rounded-lg border p-6 ${statusColor}`}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {isSuccess && (
+              <FaCheckCircle className="text-green-600" size={28} />
+            )}
+            {isClientError && <span className="text-3xl">⚠️</span>}
+            {isServerError && <span className="text-3xl">❌</span>}
+            <div>
+              <p className="text-sm font-semibold opacity-75">
+                Response Status
+              </p>
+              <p className="text-3xl font-bold">{response.status}</p>
+            </div>
+          </div>
+          <div className="text-right space-y-1">
+            {response.timing && (
+              <div className="text-sm">
+                <span className="font-semibold">Time:</span> {response.timing}ms
+              </div>
+            )}
+            {response.size && (
+              <div className="text-sm">
+                <span className="font-semibold">Size:</span>{" "}
+                {(response.size / 1024).toFixed(2)} KB
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Request URL Info */}
+      <div className="rounded-lg bg-slate-100 dark:bg-slate-800 p-4">
+        <p className="text-sm font-mono text-slate-600 dark:text-slate-400 mb-2">
+          {request.method}
+        </p>
+        <p className="text-slate-900 dark:text-white font-mono text-sm break-all">
+          {request.url}
+        </p>
+      </div>
+
+      {/* Headers Section */}
+      <div className="rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <button
+          onClick={() => toggleSection("headers")}
+          className="w-full flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+        >
+          <h3 className="font-semibold text-slate-900 dark:text-white">
+            Response Headers ({Object.keys(response.headers).length})
+          </h3>
+          {expandedSections.headers ? (
+            <FaChevronUp size={18} />
+          ) : (
+            <FaChevronDown size={18} />
+          )}
+        </button>
+        {expandedSections.headers && (
+          <div className="p-4 bg-slate-900 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-700 max-h-64 overflow-auto">
+            <div className="space-y-2 font-mono text-sm">
+              {Object.entries(response.headers).map(([key, value]) => (
+                <div key={key} className="flex gap-2 text-slate-300">
+                  <span className="text-purple-400 font-semibold">{key}:</span>
+                  <span className="text-slate-400 break-all">
+                    {value as string}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Response Body Section */}
+      <div className="rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <button
+          onClick={() => toggleSection("body")}
+          className="w-full flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+        >
+          <h3 className="font-semibold text-slate-900 dark:text-white">
+            Response Body
+          </h3>
+          {expandedSections.body ? (
+            <FaChevronUp size={18} />
+          ) : (
+            <FaChevronDown size={18} />
+          )}
+        </button>
+        {expandedSections.body && (
+          <div className="p-4 bg-slate-900 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-700">
+            <pre className="text-slate-300 font-mono text-sm overflow-auto max-h-96 whitespace-pre-wrap word-break">
+              {JSON.stringify(response.body, null, 2)}
+            </pre>
+          </div>
+        )}
+      </div>
+
+      {/* Fetch Code Generator */}
+      <div className="rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div className="flex items-center justify-between p-4 bg-indigo-50 dark:bg-indigo-950/30 border-b border-indigo-200 dark:border-indigo-800">
+          <h3 className="font-semibold text-indigo-900 dark:text-indigo-200">
+            Generated Fetch Code
+          </h3>
           <button
             onClick={handleCopy}
-            className="flex py-3 px-8 bg-orange-500 hover:bg-orange-400 rounded-md transition"
+            className="flex items-center gap-2 px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-all"
           >
-            {copied ? (
-              "Copied!"
-            ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="2"
-                stroke="currentColor"
-                className="w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184"
-                />
-              </svg>
-            )}
+            <FaCopy size={14} />
+            {copied ? "Copied!" : "Copy"}
           </button>
         </div>
-
-        {response.headers && (
-          <>
-            <h3 className="mt-4 font-semibold">Headers</h3>
-            <pre className="bg-gray-700 p-3 rounded-md overflow-auto text-sm">
-              {formattedHeaders.join("\n")}
-            </pre>
-          </>
-        )}
-
-        <h3 className="mt-4 font-semibold">Body</h3>
-        <pre className="bg-gray-700 p-3 max-h-100 rounded-md overflow-auto text-sm">
-          {JSON.stringify(response.body, null, 2)}
-        </pre>
+        <div className="p-4 bg-slate-900 dark:bg-slate-950">
+          <pre className="text-slate-300 font-mono text-sm overflow-auto max-h-64 whitespace-pre-wrap word-break">
+            {code}
+          </pre>
+        </div>
       </div>
     </div>
   );

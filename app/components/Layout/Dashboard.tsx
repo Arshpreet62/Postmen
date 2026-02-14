@@ -3,10 +3,17 @@
 import React, { useState } from "react";
 import { useGlobal } from "./context/Context";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import RequestForm from "../UI/Form";
 import RequestHistory from "../UI/RequestHistory";
 import Statistics from "../UI/Statics";
 import ResponseShowcase from "../UI/ResponseDisplay";
+import {
+  FaSignOutAlt,
+  FaFileAlt,
+  FaChartBar,
+  FaPaperPlane,
+} from "react-icons/fa";
 
 const Dashboard: React.FC = () => {
   const { user, logout, responseData } = useGlobal();
@@ -27,83 +34,136 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const tabs = [
+    { id: "request", label: "Make Request", icon: FaPaperPlane },
+    { id: "history", label: "History", icon: FaFileAlt },
+    { id: "stats", label: "Statistics", icon: FaChartBar },
+  ] as const;
+
   return (
-    <div className="h-screen bg-gray-50">
-      <header className="bg-white shadow">
+    <div className="min-h-screen bg-gradient-to-br from-white via-slate-50 to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
+      {/* Top Navigation */}
+      <header className="sticky top-0 z-40 backdrop-blur-md bg-white/80 dark:bg-slate-950/80 border-b border-slate-200 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <h1 className="text-3xl font-bold text-gray-900">API Tester</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">
-                Welcome, {user ? user.email : "Guest"}
-              </span>
+          <div className="flex justify-between items-center py-4">
+            {/* Logo & Brand */}
+            <Link href="/" className="flex items-center gap-3">
+              <div className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                ⚡ Postmen
+              </div>
+            </Link>
+
+            {/* User Info */}
+            <div className="flex items-center gap-6">
+              <div className="hidden sm:flex flex-col items-end">
+                <p className="text-sm font-medium text-slate-900 dark:text-white">
+                  {user?.email || "User"}
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Connected
+                </p>
+              </div>
+
+              {/* Logout Button */}
               <button
                 onClick={handleLogout}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 font-semibold transition-all duration-300 hover:scale-105"
               >
-                Logout
+                <FaSignOutAlt size={18} />
+                <span className="hidden sm:inline">Logout</span>
               </button>
             </div>
           </div>
         </div>
       </header>
 
-      <nav className="bg-white border-b border-gray-200">
+      {/* Tab Navigation */}
+      <div className="sticky top-16 z-30 backdrop-blur-md bg-white/50 dark:bg-slate-950/50 border-b border-slate-200 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-8">
-            <button
-              onClick={() => setActiveTab("request")}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === "request"
-                  ? "border-indigo-500 text-indigo-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              }`}
-            >
-              Make Request
-            </button>
-            <button
-              onClick={() => setActiveTab("history")}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === "history"
-                  ? "border-indigo-500 text-indigo-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              }`}
-            >
-              Request History
-            </button>
-            <button
-              onClick={() => setActiveTab("stats")}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === "stats"
-                  ? "border-indigo-500 text-indigo-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              }`}
-            >
-              Statistics
-            </button>
+          <div className="flex gap-1 overflow-x-auto hide-scrollbar">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`py-4 px-6 font-medium text-sm flex items-center gap-2 whitespace-nowrap transition-all duration-300 relative ${
+                    activeTab === tab.id
+                      ? "text-indigo-600 dark:text-indigo-400"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                  }`}
+                >
+                  <Icon size={18} />
+                  {tab.label}
+                  {activeTab === tab.id && (
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-t-full"></div>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
-      </nav>
+      </div>
 
-      <main className="max-w-7xl mx-auto py-2 sm:px-6 lg:px-8">
-        <div className="px-4 py-4 sm:px-0">
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="animate-fadeInUp">
           {activeTab === "request" && (
             <div className="space-y-6">
-              <RequestForm />
+              {/* Request Form Card */}
+              <div className="glass rounded-2xl p-8 backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 shadow-lg border border-white/20 dark:border-slate-700/30">
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                  <FaPaperPlane className="text-indigo-600" size={20} />
+                  Create API Request
+                </h2>
+                <RequestForm />
+              </div>
+
+              {/* Response Display Card */}
               {responseData && (
-                <ResponseShowcase
-                  request={responseData.request}
-                  response={responseData.response}
-                />
+                <div className="glass rounded-2xl p-8 backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 shadow-lg border border-white/20 dark:border-slate-700/30">
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">
+                    Response
+                  </h2>
+                  <ResponseShowcase
+                    request={responseData.request}
+                    response={responseData.response}
+                  />
+                </div>
               )}
             </div>
           )}
-          {activeTab === "history" && <RequestHistory />}
-          {activeTab === "stats" && <Statistics />}
+
+          {activeTab === "history" && (
+            <div className="glass rounded-2xl p-8 backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 shadow-lg border border-white/20 dark:border-slate-700/30">
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                <FaFileAlt className="text-indigo-600" size={20} />
+                Request History
+              </h2>
+              <RequestHistory />
+            </div>
+          )}
+
+          {activeTab === "stats" && (
+            <div className="space-y-6">
+              <div className="glass rounded-2xl p-8 backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 shadow-lg border border-white/20 dark:border-slate-700/30">
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                  <FaChartBar className="text-indigo-600" size={20} />
+                  Statistics & Analytics
+                </h2>
+                <Statistics />
+              </div>
+            </div>
+          )}
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="border-t border-slate-200 dark:border-slate-800 py-8 px-4 sm:px-6 lg:px-8 mt-16">
+        <div className="max-w-7xl mx-auto text-center text-slate-600 dark:text-slate-400 text-sm">
+          © 2026 Postmen. Built with ⚡ for API developers.
+        </div>
+      </footer>
     </div>
   );
 };
