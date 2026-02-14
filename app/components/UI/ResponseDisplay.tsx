@@ -18,7 +18,7 @@ export type RequestData = {
 export type ResponseData = {
   status: number;
   statusText?: string;
-  headers: Record<string, string>;
+  headers?: Record<string, string>;
   body: any;
   timing?: number;
   size?: number;
@@ -133,35 +133,37 @@ const ResponseShowcase: React.FC<Props> = ({ request, response }) => {
       </div>
 
       {/* Headers Section */}
-      <div className="rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
-        <button
-          onClick={() => toggleSection("headers")}
-          className="w-full flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-        >
-          <h3 className="font-semibold text-slate-900 dark:text-white">
-            Response Headers ({Object.keys(response.headers).length})
-          </h3>
-          {expandedSections.headers ? (
-            <FaChevronUp size={18} />
-          ) : (
-            <FaChevronDown size={18} />
-          )}
-        </button>
-        {expandedSections.headers && (
-          <div className="p-4 bg-slate-900 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-700 max-h-64 overflow-auto">
-            <div className="space-y-2 font-mono text-sm">
-              {Object.entries(response.headers).map(([key, value]) => (
-                <div key={key} className="flex gap-2 text-slate-300">
-                  <span className="text-purple-400 font-semibold">{key}:</span>
-                  <span className="text-slate-400 break-all">
-                    {value as string}
-                  </span>
-                </div>
-              ))}
+      {response.headers && Object.keys(response.headers).length > 0 && (
+        <div className="rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <button
+            onClick={() => toggleSection("headers")}
+            className="w-full flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          >
+            <h3 className="font-semibold text-slate-900 dark:text-white">
+              Response Headers ({Object.keys(response.headers).length})
+            </h3>
+            {expandedSections.headers ? (
+              <FaChevronUp size={18} />
+            ) : (
+              <FaChevronDown size={18} />
+            )}
+          </button>
+          {expandedSections.headers && (
+            <div className="p-4 bg-slate-900 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-700 max-h-64 overflow-auto">
+              <div className="space-y-2 font-mono text-sm">
+                {Object.entries(response.headers).map(([key, value]) => (
+                  <div key={key} className="flex gap-2 text-slate-300">
+                    <span className="text-purple-400 font-semibold">{key}:</span>
+                    <span className="text-slate-400 break-all">
+                      {value as string}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       {/* Response Body Section */}
       <div className="rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
