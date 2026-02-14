@@ -18,11 +18,11 @@ const Landing: React.FC = () => {
   }, [isAuthenticated, user, router]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-slate-50 to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 overflow-hidden">
+    <div className="min-h-screen bg-linear-to-br from-white via-slate-50 to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 overflow-hidden">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-white/80 dark:bg-slate-950/80 border-b border-slate-200 dark:border-slate-800">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-slate-900 border-b-2 border-slate-300 dark:border-slate-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+          <div className="text-2xl font-bold bg-linear-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
             ⚡ Postmen
           </div>
           <div className="flex gap-4">
@@ -34,7 +34,7 @@ const Landing: React.FC = () => {
             </Link>
             <Link
               href="/signup"
-              className="px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-300"
+              className="px-6 py-2 bg-linear-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-300"
             >
               Get Started
             </Link>
@@ -50,7 +50,7 @@ const Landing: React.FC = () => {
             <div className="space-y-4">
               <h1 className="text-5xl lg:text-6xl font-bold leading-tight text-slate-900 dark:text-white">
                 API Testing,
-                <span className="block bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                <span className="block bg-linear-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                   Reimagined
                 </span>
               </h1>
@@ -101,8 +101,8 @@ const Landing: React.FC = () => {
           {/* Right: Hero Image */}
           <div className="animate-slideInRight relative hidden lg:block">
             <div className="relative w-full aspect-square">
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl blur-3xl opacity-20"></div>
-              <div className="relative bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-8 backdrop-blur-xl border border-slate-700">
+              <div className="absolute inset-0 bg-linear-to-r from-indigo-600 to-purple-600 rounded-3xl blur-3xl opacity-20"></div>
+              <div className="relative bg-linear-to-br from-slate-900 to-slate-800 rounded-3xl p-8 border border-slate-700">
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-slate-400">GET</span>
@@ -143,7 +143,7 @@ const Landing: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Feature 1 */}
           <div className="card-hover glass p-8 rounded-2xl space-y-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 bg-linear-to-br from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center">
               <FaLightbulb size={24} className="text-white" />
             </div>
             <h3 className="text-xl font-bold text-slate-900 dark:text-white">
@@ -157,7 +157,7 @@ const Landing: React.FC = () => {
 
           {/* Feature 2 */}
           <div className="card-hover glass p-8 rounded-2xl space-y-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 bg-linear-to-br from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center">
               <FaLock size={24} className="text-white" />
             </div>
             <h3 className="text-xl font-bold text-slate-900 dark:text-white">
@@ -171,7 +171,7 @@ const Landing: React.FC = () => {
 
           {/* Feature 3 */}
           <div className="card-hover glass p-8 rounded-2xl space-y-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 bg-linear-to-br from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center">
               <RxCheckCircled size={24} className="text-white" />
             </div>
             <h3 className="text-xl font-bold text-slate-900 dark:text-white">
@@ -186,7 +186,7 @@ const Landing: React.FC = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-indigo-600 to-purple-600">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-linear-to-r from-indigo-600 to-purple-600">
         <div className="max-w-4xl mx-auto text-center space-y-8">
           <h2 className="text-4xl font-bold text-white">
             Ready to test like a pro?

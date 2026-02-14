@@ -80,8 +80,8 @@ const Statistics: React.FC = () => {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
-          <p className="text-slate-600 dark:text-slate-400">
+          <div className="w-16 h-16 border-4 border-indigo-300 dark:border-indigo-600 border-t-indigo-600 dark:border-t-indigo-300 rounded-full animate-spin"></div>
+          <p className="text-base font-medium text-slate-700 dark:text-slate-300">
             Loading statistics...
           </p>
         </div>
@@ -92,11 +92,11 @@ const Statistics: React.FC = () => {
   if (!stats || stats.totalRequests === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
-        <div className="text-6xl mb-4">📊</div>
-        <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
+        <div className="text-8xl mb-4">📊</div>
+        <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
           No statistics yet
         </h3>
-        <p className="text-slate-600 dark:text-slate-400">
+        <p className="text-lg font-medium text-slate-700 dark:text-slate-300">
           Make some API requests to see statistics
         </p>
       </div>
@@ -130,16 +130,16 @@ const Statistics: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+          <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white">
             Request Statistics
           </h2>
-          <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+          <p className="text-base font-medium text-slate-700 dark:text-slate-300 mt-1">
             Overview of your API testing metrics
           </p>
         </div>
         <button
           onClick={fetchStatistics}
-          className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg font-medium text-sm transition-all transform hover:scale-105"
+          className="px-5 py-3 bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg text-base font-bold transition-all transform hover:scale-105"
         >
           Refresh
         </button>
@@ -148,85 +148,87 @@ const Statistics: React.FC = () => {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Requests Card */}
-        <div className="glass rounded-xl p-6 border border-white/20 hover:border-indigo-300/50 hover:shadow-lg transition-all">
+        <div className="glass rounded-xl p-6 border-2 border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-lg transition-all">
           <div className="flex items-start justify-between mb-4">
             <div className="p-3 bg-indigo-500/20 rounded-lg">
-              <span className="text-2xl">📊</span>
+              <span className="text-3xl">📊</span>
             </div>
             <div className="text-indigo-600 dark:text-indigo-400">
-              <FaArrowUp size={18} />
+              <FaArrowUp size={20} />
             </div>
           </div>
-          <p className="text-sm text-slate-600 dark:text-slate-400 mb-1 font-medium">
+          <p className="text-base font-bold text-slate-700 dark:text-slate-300 mb-1">
             Total Requests
           </p>
-          <p className="text-3xl font-bold text-slate-900 dark:text-white">
+          <p className="text-4xl font-extrabold text-slate-900 dark:text-white">
             <AnimatedCounter value={stats.totalRequests} />
           </p>
         </div>
 
         {/* Successful Card */}
-        <div className="glass rounded-xl p-6 border border-white/20 hover:border-green-300/50 hover:shadow-lg transition-all">
+        <div className="glass rounded-xl p-6 border-2 border-slate-200 dark:border-slate-700 hover:border-green-400 dark:hover:border-green-500 hover:shadow-lg transition-all">
           <div className="flex items-start justify-between mb-4">
             <div className="p-3 bg-green-500/20 rounded-lg">
-              <FaCheck className="text-2xl text-green-600" />
+              <FaCheck className="text-3xl text-green-600" />
             </div>
             <div className="text-green-600 dark:text-green-400">
-              <FaArrowUp size={18} />
+              <FaArrowUp size={20} />
             </div>
           </div>
-          <p className="text-sm text-slate-600 dark:text-slate-400 mb-1 font-medium">
+          <p className="text-base font-bold text-slate-700 dark:text-slate-300 mb-1">
             Successful
           </p>
-          <p className="text-3xl font-bold text-green-600">
+          <p className="text-4xl font-extrabold text-green-600 dark:text-green-500">
             <AnimatedCounter value={stats.successfulRequests} />
           </p>
         </div>
 
         {/* Failed Card */}
-        <div className="glass rounded-xl p-6 border border-white/20 hover:border-red-300/50 hover:shadow-lg transition-all">
+        <div className="glass rounded-xl p-6 border-2 border-slate-200 dark:border-slate-700 hover:border-red-400 dark:hover:border-red-500 hover:shadow-lg transition-all">
           <div className="flex items-start justify-between mb-4">
             <div className="p-3 bg-red-500/20 rounded-lg">
-              <FaTimes className="text-2xl text-red-600" />
+              <FaTimes className="text-3xl text-red-600" />
             </div>
             <div className="text-red-600 dark:text-red-400">
-              <FaArrowDown size={18} />
+              <FaArrowDown size={20} />
             </div>
           </div>
-          <p className="text-sm text-slate-600 dark:text-slate-400 mb-1 font-medium">
+          <p className="text-base font-bold text-slate-700 dark:text-slate-300 mb-1">
             Failed
           </p>
-          <p className="text-3xl font-bold text-red-600">
+          <p className="text-4xl font-extrabold text-red-600 dark:text-red-500">
             <AnimatedCounter value={stats.failedRequests} />
           </p>
         </div>
 
         {/* Success Rate Card */}
-        <div className="glass rounded-xl p-6 border border-white/20 hover:border-blue-300/50 hover:shadow-lg transition-all">
+        <div className="glass rounded-xl p-6 border-2 border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg transition-all">
           <div className="flex items-start justify-between mb-4">
             <div className="p-3 bg-blue-500/20 rounded-lg">
-              <span className="text-2xl">%</span>
+              <span className="text-3xl">%</span>
             </div>
             <div
               className={
                 successRatePercent >= 80 ? "text-green-600" : "text-yellow-600"
               }
             >
-              <FaArrowUp size={18} />
+              <FaArrowUp size={20} />
             </div>
           </div>
-          <p className="text-sm text-slate-600 dark:text-slate-400 mb-1 font-medium">
+          <p className="text-base font-bold text-slate-700 dark:text-slate-300 mb-1">
             Success Rate
           </p>
-          <p className="text-3xl font-bold text-blue-600">{successRateNum}%</p>
+          <p className="text-4xl font-extrabold text-blue-600 dark:text-blue-500">
+            {successRateNum}%
+          </p>
         </div>
       </div>
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Methods Breakdown */}
-        <div className="glass rounded-xl p-6 border border-white/20">
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-6">
+        <div className="glass rounded-xl p-6 border-2 border-slate-200 dark:border-slate-700">
+          <h3 className="text-xl font-extrabold text-slate-900 dark:text-white mb-6">
             Requests by Method
           </h3>
           <div className="space-y-5">
@@ -239,21 +241,21 @@ const Statistics: React.FC = () => {
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-3">
                         <div
-                          className={`w-4 h-4 rounded-full ${getMethodColor(
+                          className={`w-5 h-5 rounded-full ${getMethodColor(
                             method,
                           )}`}
                         ></div>
-                        <span className="font-semibold text-slate-900 dark:text-white">
+                        <span className="text-base font-bold text-slate-900 dark:text-white">
                           {method}
                         </span>
                       </div>
-                      <span className="text-sm text-slate-600 dark:text-slate-400">
+                      <span className="text-base font-medium text-slate-700 dark:text-slate-300">
                         {count} ({percentage.toFixed(1)}%)
                       </span>
                     </div>
-                    <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
+                    <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3 overflow-hidden">
                       <div
-                        className={`h-2 rounded-full ${getMethodColor(method)} transition-all duration-500`}
+                        className={`h-3 rounded-full ${getMethodColor(method)} transition-all duration-500`}
                         style={{ width: `${percentage}%` }}
                       ></div>
                     </div>
@@ -264,8 +266,8 @@ const Statistics: React.FC = () => {
         </div>
 
         {/* Status Codes Breakdown */}
-        <div className="glass rounded-xl p-6 border border-white/20">
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-6">
+        <div className="glass rounded-xl p-6 border-2 border-slate-200 dark:border-slate-700">
+          <h3 className="text-xl font-extrabold text-slate-900 dark:text-white mb-6">
             Requests by Status
           </h3>
           <div className="space-y-5">
@@ -278,21 +280,21 @@ const Statistics: React.FC = () => {
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-3">
                         <div
-                          className={`w-4 h-4 rounded-full ${getStatusColor(
+                          className={`w-5 h-5 rounded-full ${getStatusColor(
                             status,
                           )}`}
                         ></div>
-                        <span className="font-semibold text-slate-900 dark:text-white">
+                        <span className="text-base font-bold text-slate-900 dark:text-white">
                           {status}
                         </span>
                       </div>
-                      <span className="text-sm text-slate-600 dark:text-slate-400">
+                      <span className="text-base font-medium text-slate-700 dark:text-slate-300">
                         {count} ({percentage.toFixed(1)}%)
                       </span>
                     </div>
-                    <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
+                    <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3 overflow-hidden">
                       <div
-                        className={`h-2 rounded-full ${getStatusColor(
+                        className={`h-3 rounded-full ${getStatusColor(
                           status,
                         )} transition-all duration-500`}
                         style={{ width: `${percentage}%` }}
@@ -306,35 +308,35 @@ const Statistics: React.FC = () => {
       </div>
 
       {/* Success Rate Overview */}
-      <div className="glass rounded-xl p-8 border border-white/20 bg-gradient-to-br from-indigo-50/50 to-purple-50/50 dark:from-slate-800/50 dark:to-slate-900/50">
+      <div className="glass rounded-xl p-8 border-2 border-slate-200 dark:border-slate-700 bg-linear-to-br from-indigo-50/50 to-purple-50/50 dark:from-slate-800/50 dark:to-slate-900/50">
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+            <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">
               Success Rate Overview
             </h3>
-            <span className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
+            <span className="text-4xl font-extrabold text-indigo-600 dark:text-indigo-400">
               {successRateNum}%
             </span>
           </div>
-          <p className="text-sm text-slate-600 dark:text-slate-400">
+          <p className="text-base font-medium text-slate-700 dark:text-slate-300">
             {stats.successfulRequests} of {stats.totalRequests} requests were
             successful
           </p>
         </div>
 
         {/* Animated Progress Bar */}
-        <div className="relative w-full h-4 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+        <div className="relative w-full h-5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
           <div
-            className="h-4 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 transition-all duration-1000 ease-out"
+            className="h-5 rounded-full bg-linear-to-r from-green-500 to-emerald-500 transition-all duration-1000 ease-out"
             style={{ width: `${successRatePercent}%` }}
           ></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 rounded-full animate-pulse"></div>
+          <div className="absolute inset-0 bg-linear-to-r from-transparent via-white to-transparent opacity-30 rounded-full animate-pulse"></div>
         </div>
 
         {/* Status Indicator */}
-        <div className="mt-6 flex items-center gap-4 p-4 rounded-lg bg-white/50 dark:bg-slate-800/50">
+        <div className="mt-6 flex items-center gap-4 p-5 rounded-lg bg-slate-200/90 dark:bg-slate-700/90 border-2 border-slate-300 dark:border-slate-600">
           <div
-            className={`w-4 h-4 rounded-full ${
+            className={`w-5 h-5 rounded-full ${
               successRatePercent >= 80
                 ? "bg-green-500 animate-pulse"
                 : successRatePercent >= 50
@@ -343,14 +345,14 @@ const Statistics: React.FC = () => {
             }`}
           ></div>
           <div>
-            <p className="text-sm font-medium text-slate-900 dark:text-white">
+            <p className="text-base font-bold text-slate-900 dark:text-white">
               {successRatePercent >= 80
                 ? "🎉 Excellent performance"
                 : successRatePercent >= 50
                   ? "⚠️ Good performance"
                   : "❌ Needs improvement"}
             </p>
-            <p className="text-xs text-slate-600 dark:text-slate-400">
+            <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
               {successRatePercent >= 80
                 ? "Your API requests are performing excellently"
                 : successRatePercent >= 50

@@ -10,6 +10,13 @@ body {
     Cantarell, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: #f0eefc;
+  color: #000000;
+}
+
+.dark body {
+  background: #2b2723;
+  color: #f0eefc;
 }
 
 .hide-scrollbar {
@@ -21,27 +28,39 @@ body {
   display: none;
 }
 
-/* Modern Glass Morphism */
+/* Custom Color Palette */
+:root {
+  --color-dark: #2b2723; /* Dark brown/charcoal */
+  --color-light: #f0eefc; /* Light lavender */
+  --color-accent: #eb4520; /* Orange/red accent */
+  --color-text: #000000; /* Black text */
+}
+
+/* Solid backgrounds - custom palette */
 .glass {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #090930;
+  border: 2px solid #2b2723;
+  color: #000000;
 }
 
 .dark .glass {
-  background: rgba(15, 23, 42, 0.8);
-  border: 1px solid rgba(51, 65, 85, 0.3);
+  background: #2b2723;
+  border: 2px solid #eb4520;
+  color: #f0eefc;
 }
 
 /* Smooth gradient button */
 .btn-gradient {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: #eb4520;
   transition: all 0.3s ease;
+  color: #f0eefc;
+  font-weight: 700;
 }
 
 .btn-gradient:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 12px 24px rgba(235, 69, 32, 0.4);
+  background: #d63d1c;
 }
 
 .btn-gradient:active {
@@ -51,12 +70,14 @@ body {
 /* Smooth text input */
 .input-smooth {
   transition: all 0.3s ease;
-  border-color: #e5e7eb;
+  border-color: #2b2723;
+  background: #f0eefc;
+  color: #000000;
 }
 
 .input-smooth:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  border-color: #eb4520;
+  box-shadow: 0 0 0 3px rgba(235, 69, 32, 0.1);
   transform: translateY(-2px);
 }
 
@@ -67,18 +88,21 @@ body {
 
 .card-hover:hover {
   transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 40px rgba(43, 39, 35, 0.2);
 }
 
 /* Success, error, warning states */
 .state-success {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: #2b2723;
+  color: #f0eefc;
 }
 
 .state-error {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  background: #eb4520;
+  color: #f0eefc;
 }
 
 .state-warning {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  background: #eb4520;
+  color: #000000;
 }

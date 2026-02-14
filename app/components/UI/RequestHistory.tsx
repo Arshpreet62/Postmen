@@ -61,7 +61,7 @@ const RequestHistory: React.FC = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        apiUrl(`/api/history?page=${page}&limit=9`),
+        apiUrl(`/api/history?page=${page}&limit=6`),
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -157,8 +157,8 @@ const RequestHistory: React.FC = () => {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
-          <p className="text-slate-600 dark:text-slate-400">
+          <div className="w-16 h-16 border-4 border-indigo-300 dark:border-indigo-600 border-t-indigo-600 dark:border-t-indigo-300 rounded-full animate-spin"></div>
+          <p className="text-base font-medium text-slate-700 dark:text-slate-300">
             Loading history...
           </p>
         </div>
@@ -171,17 +171,17 @@ const RequestHistory: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+          <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white">
             Request History
           </h2>
-          <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+          <p className="text-base font-medium text-slate-700 dark:text-slate-300 mt-1">
             {pagination?.totalRequests || 0} total requests
           </p>
         </div>
         {history.length > 0 && (
           <button
             onClick={clearAllHistory}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium text-sm transition-colors"
+            className="px-5 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg text-base font-bold transition-colors"
           >
             Clear All
           </button>
@@ -191,52 +191,54 @@ const RequestHistory: React.FC = () => {
       {/* Empty State */}
       {history.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="text-6xl mb-4">📋</div>
-          <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
+          <div className="text-8xl mb-4">📋</div>
+          <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
             No request history yet
           </h3>
-          <p className="text-slate-600 dark:text-slate-400">
+          <p className="text-lg font-medium text-slate-700 dark:text-slate-300">
             Make some API requests to see them here
           </p>
         </div>
       ) : (
         <>
           {/* Grid of Request Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 grid-rows-2 gap-5 max-w-6xl mx-auto">
             {history.map((req) => (
               <div
                 key={req._id}
-                className="group glass rounded-xl p-5 border border-white/20 hover:border-indigo-300/50 hover:shadow-lg transition-all duration-300 cursor-pointer"
+                className="group glass rounded-xl p-4 border-2 border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-lg transition-all duration-300 cursor-pointer"
                 onClick={() => setSelectedRequest(req)}
               >
                 {/* Method & Status Badges */}
-                <div className="flex items-start justify-between mb-3">
+                <div className="flex items-start justify-between mb-4">
                   <span
-                    className={`${getMethodColor(req.method)} px-3 py-1 rounded-full text-xs font-bold border`}
+                    className={`${getMethodColor(req.method)} px-4 py-2 rounded-full text-sm font-extrabold border-2`}
                   >
                     {req.method}
                   </span>
                   <span
-                    className={`${getStatusColor(req.response.status)} px-3 py-1 rounded-full text-xs font-bold border`}
+                    className={`${getStatusColor(req.response.status)} px-4 py-2 rounded-full text-sm font-extrabold border-2`}
                   >
                     {req.response.status}
                   </span>
                 </div>
 
                 {/* URL */}
-                <div className="mb-3">
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">
+                <div className="mb-2">
+                  <p className="text-sm font-bold text-slate-600 dark:text-slate-300 mb-1">
                     Endpoint
                   </p>
-                  <p className="text-sm font-mono text-slate-900 dark:text-white truncate hover:text-clip">
-                    {req.endpoint.split("/").slice(2).join("/").slice(0, 30)}
-                    ...
+                  <p
+                    className="text-sm font-mono font-medium text-slate-900 dark:text-white truncate"
+                    title={req.endpoint}
+                  >
+                    {req.endpoint}
                   </p>
                 </div>
 
                 {/* Timestamp */}
                 <div className="flex items-center justify-between">
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                  <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
                     {new Date(req.timestamp).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
@@ -247,15 +249,15 @@ const RequestHistory: React.FC = () => {
                 </div>
 
                 {/* Action Buttons - Show on Hover */}
-                <div className="flex gap-2 mt-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex gap-2 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       setSelectedRequest(req);
                     }}
-                    className="flex-1 flex items-center justify-center gap-2 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors"
+                    className="flex-1 flex items-center justify-center gap-2 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-bold transition-colors"
                   >
-                    <FaEye size={14} />
+                    <FaEye size={16} />
                     View
                   </button>
                   <button
@@ -263,9 +265,9 @@ const RequestHistory: React.FC = () => {
                       e.stopPropagation();
                       deleteRequest(req._id);
                     }}
-                    className="flex-1 flex items-center justify-center gap-2 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
+                    className="flex-1 flex items-center justify-center gap-2 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-bold transition-colors"
                   >
-                    <FaTrash size={14} />
+                    <FaTrash size={16} />
                     Delete
                   </button>
                 </div>
@@ -279,9 +281,9 @@ const RequestHistory: React.FC = () => {
               <button
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center gap-2 px-5 py-3 rounded-lg border-2 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                <FaChevronLeft size={16} />
+                <FaChevronLeft size={18} />
               </button>
 
               <div className="flex items-center gap-1">
@@ -291,17 +293,17 @@ const RequestHistory: React.FC = () => {
                     <button
                       key={page}
                       onClick={() => setCurrentPage(page)}
-                      className={`w-10 h-10 rounded-lg font-medium transition-all ${
+                      className={`w-12 h-12 text-base font-bold rounded-lg transition-all ${
                         currentPage === page
-                          ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white"
-                          : "border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800"
+                          ? "bg-linear-to-r from-indigo-600 to-purple-600 text-white"
+                          : "border-2 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200"
                       }`}
                     >
                       {page}
                     </button>
                   ))}
                 {pagination.totalPages > 5 && (
-                  <span className="text-slate-600 dark:text-slate-400 px-2">
+                  <span className="text-slate-700 dark:text-slate-300 text-lg font-bold px-2">
                     ...
                   </span>
                 )}
@@ -314,9 +316,9 @@ const RequestHistory: React.FC = () => {
                   )
                 }
                 disabled={currentPage === pagination.totalPages}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center gap-2 px-5 py-3 rounded-lg border-2 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                <FaChevronRight size={16} />
+                <FaChevronRight size={18} />
               </button>
             </div>
           )}
@@ -325,31 +327,32 @@ const RequestHistory: React.FC = () => {
 
       {/* Modal */}
       {selectedRequest && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="glass rounded-2xl border border-white/20 max-w-2xl w-full max-h-96 overflow-y-auto shadow-2xl">
+        <div className="fixed inset-0 rounded-2xl bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="glass rounded-2xl border-2 border-slate-300 dark:border-slate-600 w-full max-w-6xl max-h-[70vh] overflow-y-auto shadow-2xl">
             {/* Header */}
-            <div className="sticky top-0 flex items-center justify-between p-6 border-b border-white/20 bg-white/50 dark:bg-slate-900/50 backdrop-blur">
+            <div className="sticky top-0 flex items-center justify-between p-6 border-b-2 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800">
               <div className="flex items-center gap-4">
                 <span
-                  className={`${getMethodColor(selectedRequest.method)} px-3 py-1 rounded-full text-sm font-bold border`}
+                  className={`${getMethodColor(selectedRequest.method)} px-4 py-2 rounded-full text-base font-extrabold border-2`}
                 >
                   {selectedRequest.method}
                 </span>
                 <span
-                  className={`${getStatusColor(selectedRequest.response.status)} px-3 py-1 rounded-full text-sm font-bold border`}
+                  className={`${getStatusColor(selectedRequest.response.status)} px-4 py-2 rounded-full text-base font-extrabold border-2`}
                 >
                   {selectedRequest.response.status}
                 </span>
               </div>
               <button
                 onClick={() => setSelectedRequest(null)}
-                className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                className="p-3 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors"
               >
-                <FaTimes size={20} />
+                <FaTimes size={24} />
               </button>
             </div>
 
             {/* Content */}
+
             <div className="p-6">
               <ResponseShowcase
                 request={{

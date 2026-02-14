@@ -43,7 +43,7 @@ export default function RootLayout({
           .animate-glow { animation: glow 2s infinite; }
         `}</style>
       </head>
-      <body className="bg-gradient-to-br from-white via-slate-50 to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 transition-colors duration-300">
+      <body className="bg-linear-to-br from-white via-slate-50 to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 transition-colors duration-300">
         <ContextProvider>{children}</ContextProvider>
       </body>
     </html>
