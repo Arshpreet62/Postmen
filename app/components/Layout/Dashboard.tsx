@@ -86,7 +86,7 @@ const Dashboard: React.FC = () => {
       {/* Tab Navigation */}
       <div className="sticky h-15 top-16 z-30 border-b border-border bg-background/70 backdrop-blur">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex gap-2  hide-scrollbar">
+          <div className="flex gap-2 overflow-x-auto hide-scrollbar">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
