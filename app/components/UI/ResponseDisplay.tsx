@@ -184,7 +184,7 @@ const ResponseShowcase: React.FC<Props> = ({ request, response }) => {
         </button>
         {expandedSections.body && (
           <div className="p-5 bg-slate-900 dark:bg-slate-950 border-t-2 border-border">
-            <pre className="text-slate-200 font-mono text-base font-medium overflow-auto max-h-96 whitespace-pre-wrap break-words">
+            <pre className="text-slate-200 font-mono text-base font-medium overflow-auto max-h-96 whitespace-pre-wrap wrap-break-word">
               {JSON.stringify(response.body, null, 2)}
             </pre>
           </div>
@@ -206,7 +206,7 @@ const ResponseShowcase: React.FC<Props> = ({ request, response }) => {
           </button>
         </div>
         <div className="p-5 bg-slate-900 dark:bg-slate-950">
-          <pre className="text-slate-200 font-mono text-base font-medium overflow-auto max-h-64 whitespace-pre-wrap break-words">
+          <pre className="text-slate-200 font-mono text-base font-medium overflow-auto max-h-64 whitespace-pre-wrap wrap-break-word">
             {code}
           </pre>
         </div>
