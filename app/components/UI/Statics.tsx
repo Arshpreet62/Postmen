@@ -80,8 +80,8 @@ const Statistics: React.FC = () => {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 border-4 border-indigo-300 dark:border-indigo-600 border-t-indigo-600 dark:border-t-indigo-300 rounded-full animate-spin"></div>
-          <p className="text-base font-medium text-slate-700 dark:text-slate-300">
+          <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+          <p className="text-base font-medium text-muted-foreground">
             Loading statistics...
           </p>
         </div>
@@ -93,10 +93,10 @@ const Statistics: React.FC = () => {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <div className="text-8xl mb-4">📊</div>
-        <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+        <h3 className="text-2xl font-extrabold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
           No statistics yet
         </h3>
-        <p className="text-lg font-medium text-slate-700 dark:text-slate-300">
+        <p className="text-lg font-medium text-muted-foreground">
           Make some API requests to see statistics
         </p>
       </div>
@@ -130,16 +130,16 @@ const Statistics: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white">
+          <h2 className="text-3xl font-extrabold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
             Request Statistics
           </h2>
-          <p className="text-base font-medium text-slate-700 dark:text-slate-300 mt-1">
+          <p className="text-base font-medium text-muted-foreground mt-1">
             Overview of your API testing metrics
           </p>
         </div>
         <button
           onClick={fetchStatistics}
-          className="px-5 py-3 bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg text-base font-bold transition-all transform hover:scale-105"
+          className="px-5 py-3 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg text-base font-bold transition-all transform hover:scale-105"
         >
           Refresh
         </button>
@@ -148,25 +148,25 @@ const Statistics: React.FC = () => {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Requests Card */}
-        <div className="glass rounded-xl p-6 border-2 border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-lg transition-all">
+        <div className="glass rounded-xl p-6 border-2 border-border hover:border-primary/60 hover:shadow-lg transition-all">
           <div className="flex items-start justify-between mb-4">
-            <div className="p-3 bg-indigo-500/20 rounded-lg">
+            <div className="p-3 bg-primary/20 rounded-lg">
               <span className="text-3xl">📊</span>
             </div>
-            <div className="text-indigo-600 dark:text-indigo-400">
+            <div className="text-primary">
               <FaArrowUp size={20} />
             </div>
           </div>
-          <p className="text-base font-bold text-slate-700 dark:text-slate-300 mb-1">
+          <p className="text-base font-bold text-muted-foreground mb-1">
             Total Requests
           </p>
-          <p className="text-4xl font-extrabold text-slate-900 dark:text-white">
+          <p className="text-4xl font-extrabold text-foreground">
             <AnimatedCounter value={stats.totalRequests} />
           </p>
         </div>
 
         {/* Successful Card */}
-        <div className="glass rounded-xl p-6 border-2 border-slate-200 dark:border-slate-700 hover:border-green-400 dark:hover:border-green-500 hover:shadow-lg transition-all">
+        <div className="glass rounded-xl p-6 border-2 border-border hover:border-green-500/60 hover:shadow-lg transition-all">
           <div className="flex items-start justify-between mb-4">
             <div className="p-3 bg-green-500/20 rounded-lg">
               <FaCheck className="text-3xl text-green-600" />
@@ -175,16 +175,16 @@ const Statistics: React.FC = () => {
               <FaArrowUp size={20} />
             </div>
           </div>
-          <p className="text-base font-bold text-slate-700 dark:text-slate-300 mb-1">
+          <p className="text-base font-bold text-muted-foreground mb-1">
             Successful
           </p>
-          <p className="text-4xl font-extrabold text-green-600 dark:text-green-500">
+          <p className="text-4xl font-extrabold text-green-600 dark:text-green-400">
             <AnimatedCounter value={stats.successfulRequests} />
           </p>
         </div>
 
         {/* Failed Card */}
-        <div className="glass rounded-xl p-6 border-2 border-slate-200 dark:border-slate-700 hover:border-red-400 dark:hover:border-red-500 hover:shadow-lg transition-all">
+        <div className="glass rounded-xl p-6 border-2 border-border hover:border-red-500/60 hover:shadow-lg transition-all">
           <div className="flex items-start justify-between mb-4">
             <div className="p-3 bg-red-500/20 rounded-lg">
               <FaTimes className="text-3xl text-red-600" />
@@ -193,16 +193,16 @@ const Statistics: React.FC = () => {
               <FaArrowDown size={20} />
             </div>
           </div>
-          <p className="text-base font-bold text-slate-700 dark:text-slate-300 mb-1">
+          <p className="text-base font-bold text-muted-foreground mb-1">
             Failed
           </p>
-          <p className="text-4xl font-extrabold text-red-600 dark:text-red-500">
+          <p className="text-4xl font-extrabold text-red-600 dark:text-red-400">
             <AnimatedCounter value={stats.failedRequests} />
           </p>
         </div>
 
         {/* Success Rate Card */}
-        <div className="glass rounded-xl p-6 border-2 border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg transition-all">
+        <div className="glass rounded-xl p-6 border-2 border-border hover:border-accent/60 hover:shadow-lg transition-all">
           <div className="flex items-start justify-between mb-4">
             <div className="p-3 bg-blue-500/20 rounded-lg">
               <span className="text-3xl">%</span>
@@ -215,10 +215,10 @@ const Statistics: React.FC = () => {
               <FaArrowUp size={20} />
             </div>
           </div>
-          <p className="text-base font-bold text-slate-700 dark:text-slate-300 mb-1">
+          <p className="text-base font-bold text-muted-foreground mb-1">
             Success Rate
           </p>
-          <p className="text-4xl font-extrabold text-blue-600 dark:text-blue-500">
+          <p className="text-4xl font-extrabold text-accent">
             {successRateNum}%
           </p>
         </div>
@@ -227,8 +227,8 @@ const Statistics: React.FC = () => {
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Methods Breakdown */}
-        <div className="glass rounded-xl p-6 border-2 border-slate-200 dark:border-slate-700">
-          <h3 className="text-xl font-extrabold text-slate-900 dark:text-white mb-6">
+        <div className="glass rounded-xl p-6 border-2 border-border">
+          <h3 className="text-xl font-extrabold text-foreground mb-6">
             Requests by Method
           </h3>
           <div className="space-y-5">
@@ -245,15 +245,15 @@ const Statistics: React.FC = () => {
                             method,
                           )}`}
                         ></div>
-                        <span className="text-base font-bold text-slate-900 dark:text-white">
+                        <span className="text-base font-bold text-foreground">
                           {method}
                         </span>
                       </div>
-                      <span className="text-base font-medium text-slate-700 dark:text-slate-300">
+                      <span className="text-base font-medium text-muted-foreground">
                         {count} ({percentage.toFixed(1)}%)
                       </span>
                     </div>
-                    <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3 overflow-hidden">
+                    <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
                       <div
                         className={`h-3 rounded-full ${getMethodColor(method)} transition-all duration-500`}
                         style={{ width: `${percentage}%` }}
@@ -266,8 +266,8 @@ const Statistics: React.FC = () => {
         </div>
 
         {/* Status Codes Breakdown */}
-        <div className="glass rounded-xl p-6 border-2 border-slate-200 dark:border-slate-700">
-          <h3 className="text-xl font-extrabold text-slate-900 dark:text-white mb-6">
+        <div className="glass rounded-xl p-6 border-2 border-border">
+          <h3 className="text-xl font-extrabold text-foreground mb-6">
             Requests by Status
           </h3>
           <div className="space-y-5">
@@ -284,15 +284,15 @@ const Statistics: React.FC = () => {
                             status,
                           )}`}
                         ></div>
-                        <span className="text-base font-bold text-slate-900 dark:text-white">
+                        <span className="text-base font-bold text-foreground">
                           {status}
                         </span>
                       </div>
-                      <span className="text-base font-medium text-slate-700 dark:text-slate-300">
+                      <span className="text-base font-medium text-muted-foreground">
                         {count} ({percentage.toFixed(1)}%)
                       </span>
                     </div>
-                    <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3 overflow-hidden">
+                    <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
                       <div
                         className={`h-3 rounded-full ${getStatusColor(
                           status,
@@ -308,24 +308,24 @@ const Statistics: React.FC = () => {
       </div>
 
       {/* Success Rate Overview */}
-      <div className="glass rounded-xl p-8 border-2 border-slate-200 dark:border-slate-700 bg-linear-to-br from-indigo-50/50 to-purple-50/50 dark:from-slate-800/50 dark:to-slate-900/50">
+      <div className="glass rounded-xl p-8 border-2 border-border bg-linear-to-br from-primary/5 to-accent/5">
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">
+            <h3 className="text-xl font-extrabold text-foreground">
               Success Rate Overview
             </h3>
-            <span className="text-4xl font-extrabold text-indigo-600 dark:text-indigo-400">
+            <span className="text-4xl font-extrabold text-primary">
               {successRateNum}%
             </span>
           </div>
-          <p className="text-base font-medium text-slate-700 dark:text-slate-300">
+          <p className="text-base font-medium text-muted-foreground">
             {stats.successfulRequests} of {stats.totalRequests} requests were
             successful
           </p>
         </div>
 
         {/* Animated Progress Bar */}
-        <div className="relative w-full h-5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+        <div className="relative w-full h-5 bg-muted rounded-full overflow-hidden">
           <div
             className="h-5 rounded-full bg-linear-to-r from-green-500 to-emerald-500 transition-all duration-1000 ease-out"
             style={{ width: `${successRatePercent}%` }}
@@ -334,7 +334,7 @@ const Statistics: React.FC = () => {
         </div>
 
         {/* Status Indicator */}
-        <div className="mt-6 flex items-center gap-4 p-5 rounded-lg bg-slate-200/90 dark:bg-slate-700/90 border-2 border-slate-300 dark:border-slate-600">
+        <div className="mt-6 flex items-center gap-4 p-5 rounded-lg bg-muted border-2 border-border">
           <div
             className={`w-5 h-5 rounded-full ${
               successRatePercent >= 80
@@ -345,14 +345,14 @@ const Statistics: React.FC = () => {
             }`}
           ></div>
           <div>
-            <p className="text-base font-bold text-slate-900 dark:text-white">
+            <p className="text-base font-bold text-foreground">
               {successRatePercent >= 80
                 ? "🎉 Excellent performance"
                 : successRatePercent >= 50
                   ? "⚠️ Good performance"
                   : "❌ Needs improvement"}
             </p>
-            <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
+            <p className="text-sm font-medium text-muted-foreground">
               {successRatePercent >= 80
                 ? "Your API requests are performing excellently"
                 : successRatePercent >= 50

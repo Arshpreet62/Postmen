@@ -134,7 +134,7 @@ const RequestHistory: React.FC = () => {
       return "bg-yellow-500/10 text-yellow-600 border-yellow-200 dark:border-yellow-800";
     if (status >= 500)
       return "bg-red-500/10 text-red-600 border-red-200 dark:border-red-800";
-    return "bg-slate-500/10 text-slate-600";
+    return "bg-muted text-muted-foreground";
   };
 
   const getMethodColor = (method: string) => {
@@ -146,7 +146,7 @@ const RequestHistory: React.FC = () => {
       PATCH:
         "bg-purple-500/10 text-purple-600 border-purple-200 dark:border-purple-800",
     };
-    return colors[method] || "bg-slate-500/10 text-slate-600";
+    return colors[method] || "bg-muted text-muted-foreground";
   };
 
   useEffect(() => {
@@ -157,8 +157,8 @@ const RequestHistory: React.FC = () => {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 border-4 border-indigo-300 dark:border-indigo-600 border-t-indigo-600 dark:border-t-indigo-300 rounded-full animate-spin"></div>
-          <p className="text-base font-medium text-slate-700 dark:text-slate-300">
+          <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+          <p className="text-base font-medium text-muted-foreground">
             Loading history...
           </p>
         </div>
@@ -171,10 +171,10 @@ const RequestHistory: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white">
+          <h2 className="text-3xl font-extrabold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
             Request History
           </h2>
-          <p className="text-base font-medium text-slate-700 dark:text-slate-300 mt-1">
+          <p className="text-base font-medium text-muted-foreground mt-1">
             {pagination?.totalRequests || 0} total requests
           </p>
         </div>
@@ -192,10 +192,10 @@ const RequestHistory: React.FC = () => {
       {history.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <div className="text-8xl mb-4">📋</div>
-          <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+          <h3 className="text-2xl font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
             No request history yet
           </h3>
-          <p className="text-lg font-medium text-slate-700 dark:text-slate-300">
+          <p className="text-lg font-medium text-muted-foreground">
             Make some API requests to see them here
           </p>
         </div>
@@ -206,7 +206,7 @@ const RequestHistory: React.FC = () => {
             {history.map((req) => (
               <div
                 key={req._id}
-                className="group glass rounded-xl p-4 border-2 border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-lg transition-all duration-300 cursor-pointer"
+                className="group glass rounded-xl p-4 border-2 border-border hover:border-primary/60 hover:shadow-lg transition-all duration-300 cursor-pointer"
                 onClick={() => setSelectedRequest(req)}
               >
                 {/* Method & Status Badges */}
@@ -225,11 +225,11 @@ const RequestHistory: React.FC = () => {
 
                 {/* URL */}
                 <div className="mb-2">
-                  <p className="text-sm font-bold text-slate-600 dark:text-slate-300 mb-1">
+                  <p className="text-sm font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent mb-1">
                     Endpoint
                   </p>
                   <p
-                    className="text-sm font-mono font-medium text-slate-900 dark:text-white truncate"
+                    className="text-sm font-mono font-medium text-foreground truncate"
                     title={req.endpoint}
                   >
                     {req.endpoint}
@@ -238,7 +238,7 @@ const RequestHistory: React.FC = () => {
 
                 {/* Timestamp */}
                 <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                  <p className="text-sm font-medium text-muted-foreground">
                     {new Date(req.timestamp).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
@@ -255,7 +255,7 @@ const RequestHistory: React.FC = () => {
                       e.stopPropagation();
                       setSelectedRequest(req);
                     }}
-                    className="flex-1 flex items-center justify-center gap-2 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-bold transition-colors"
+                    className="flex-1 flex items-center justify-center gap-2 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg text-sm font-bold transition-colors"
                   >
                     <FaEye size={16} />
                     View
@@ -281,7 +281,7 @@ const RequestHistory: React.FC = () => {
               <button
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
-                className="flex items-center gap-2 px-5 py-3 rounded-lg border-2 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center gap-2 px-5 py-3 rounded-lg border-2 border-border hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <FaChevronLeft size={18} />
               </button>
@@ -295,15 +295,15 @@ const RequestHistory: React.FC = () => {
                       onClick={() => setCurrentPage(page)}
                       className={`w-12 h-12 text-base font-bold rounded-lg transition-all ${
                         currentPage === page
-                          ? "bg-linear-to-r from-indigo-600 to-purple-600 text-white"
-                          : "border-2 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200"
+                          ? "bg-primary text-primary-foreground"
+                          : "border-2 border-border hover:bg-muted text-foreground"
                       }`}
                     >
                       {page}
                     </button>
                   ))}
                 {pagination.totalPages > 5 && (
-                  <span className="text-slate-700 dark:text-slate-300 text-lg font-bold px-2">
+                  <span className="text-muted-foreground text-lg font-bold px-2">
                     ...
                   </span>
                 )}
@@ -316,7 +316,7 @@ const RequestHistory: React.FC = () => {
                   )
                 }
                 disabled={currentPage === pagination.totalPages}
-                className="flex items-center gap-2 px-5 py-3 rounded-lg border-2 border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center gap-2 px-5 py-3 rounded-lg border-2 border-border hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <FaChevronRight size={18} />
               </button>
@@ -328,9 +328,9 @@ const RequestHistory: React.FC = () => {
       {/* Modal */}
       {selectedRequest && (
         <div className="fixed inset-0 rounded-2xl bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="glass rounded-2xl border-2 border-slate-300 dark:border-slate-600 w-full max-w-6xl max-h-[70vh] overflow-y-auto shadow-2xl">
+          <div className="glass rounded-2xl border-2 border-border w-full max-w-6xl max-h-[70vh] overflow-y-auto shadow-2xl">
             {/* Header */}
-            <div className="sticky top-0 flex items-center justify-between p-6 border-b-2 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800">
+            <div className="sticky top-0 flex items-center justify-between p-6 border-b-2 border-border bg-card">
               <div className="flex items-center gap-4">
                 <span
                   className={`${getMethodColor(selectedRequest.method)} px-4 py-2 rounded-full text-base font-extrabold border-2`}
@@ -345,7 +345,7 @@ const RequestHistory: React.FC = () => {
               </div>
               <button
                 onClick={() => setSelectedRequest(null)}
-                className="p-3 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                className="p-3 border border-border bg-muted/50 hover:bg-muted rounded-lg transition-colors"
               >
                 <FaTimes size={24} />
               </button>

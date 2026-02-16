@@ -50,14 +50,29 @@ export const ContextProvider = ({ children }: Props) => {
     }
   };
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, remember = false) => {
     const res = await fetch(apiUrl("/api/auth/login"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, remember }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Login failed");
+
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
+    setToken(data.token);
+    setUser(data.user);
+  };
+
+  const loginWithGoogle = async (credential: string) => {
+    const res = await fetch(apiUrl("/api/auth/google"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ credential }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Google login failed");
 
     localStorage.setItem("token", data.token);
     localStorage.setItem("user", JSON.stringify(data.user));
@@ -92,6 +107,7 @@ export const ContextProvider = ({ children }: Props) => {
     loading,
     isAuthenticated: !!user && !!token,
     login,
+    loginWithGoogle,
     signup,
     logout,
     responseData,

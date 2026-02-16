@@ -49,7 +49,7 @@ const ResponseShowcase: React.FC<Props> = ({ request, response }) => {
       ? "bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 border-yellow-300 dark:border-yellow-600"
       : isServerError
         ? "bg-red-500/20 text-red-700 dark:text-red-400 border-red-300 dark:border-red-600"
-        : "bg-slate-500/20 text-slate-700 dark:text-slate-400 border-slate-300 dark:border-slate-600";
+        : "bg-muted text-muted-foreground border-border";
 
   const headers = Array.isArray(request.headers)
     ? Object.fromEntries(request.headers.map((h) => [h.key, h.value]))
@@ -125,23 +125,23 @@ const ResponseShowcase: React.FC<Props> = ({ request, response }) => {
       </div>
 
       {/* Request URL Info */}
-      <div className="rounded-lg bg-slate-100 dark:bg-slate-800 p-5 border border-slate-200 dark:border-slate-700">
-        <p className="text-base font-mono font-bold text-slate-700 dark:text-slate-300 mb-2">
+      <div className="rounded-lg bg-muted p-5 border border-border">
+        <p className="text-base font-mono font-bold text-muted-foreground mb-2">
           {request.method}
         </p>
-        <p className="text-slate-900 dark:text-white font-mono text-base font-medium break-all">
+        <p className="text-foreground font-mono text-base font-medium break-all">
           {request.url}
         </p>
       </div>
 
       {/* Headers Section */}
       {response.headers && Object.keys(response.headers).length > 0 && (
-        <div className="rounded-lg border-2 border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div className="rounded-lg border-2 border-border overflow-hidden">
           <button
             onClick={() => toggleSection("headers")}
-            className="w-full flex items-center justify-between p-5 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="w-full flex items-center justify-between p-5 bg-muted/50 hover:bg-muted transition-colors"
           >
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+            <h3 className="text-lg font-bold text-foreground">
               Response Headers ({Object.keys(response.headers).length})
             </h3>
             {expandedSections.headers ? (
@@ -151,11 +151,11 @@ const ResponseShowcase: React.FC<Props> = ({ request, response }) => {
             )}
           </button>
           {expandedSections.headers && (
-            <div className="p-5 bg-slate-900 dark:bg-slate-950 border-t-2 border-slate-200 dark:border-slate-700 max-h-64 overflow-auto">
+            <div className="p-5 bg-slate-900 dark:bg-slate-950 border-t-2 border-border max-h-64 overflow-auto">
               <div className="space-y-3 font-mono text-base">
                 {Object.entries(response.headers).map(([key, value]) => (
                   <div key={key} className="flex gap-3">
-                    <span className="text-purple-300 font-bold text-base">
+                    <span className="text-primary font-bold text-base">
                       {key}:
                     </span>
                     <span className="text-slate-200 break-all font-medium">
@@ -170,14 +170,12 @@ const ResponseShowcase: React.FC<Props> = ({ request, response }) => {
       )}
 
       {/* Response Body Section */}
-      <div className="rounded-lg border-2 border-slate-200 dark:border-slate-700 overflow-hidden">
+      <div className="rounded-lg border-2 border-border overflow-hidden">
         <button
           onClick={() => toggleSection("body")}
-          className="w-full flex items-center justify-between p-5 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          className="w-full flex items-center justify-between p-5 bg-muted/50 hover:bg-muted transition-colors"
         >
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-            Response Body
-          </h3>
+          <h3 className="text-lg font-bold text-foreground">Response Body</h3>
           {expandedSections.body ? (
             <FaChevronUp size={18} />
           ) : (
@@ -185,8 +183,8 @@ const ResponseShowcase: React.FC<Props> = ({ request, response }) => {
           )}
         </button>
         {expandedSections.body && (
-          <div className="p-5 bg-slate-900 dark:bg-slate-950 border-t-2 border-slate-200 dark:border-slate-700">
-            <pre className="text-slate-200 font-mono text-base font-medium overflow-auto max-h-96 whitespace-pre-wrap word-break">
+          <div className="p-5 bg-slate-900 dark:bg-slate-950 border-t-2 border-border">
+            <pre className="text-slate-200 font-mono text-base font-medium overflow-auto max-h-96 whitespace-pre-wrap break-words">
               {JSON.stringify(response.body, null, 2)}
             </pre>
           </div>
@@ -194,21 +192,21 @@ const ResponseShowcase: React.FC<Props> = ({ request, response }) => {
       </div>
 
       {/* Fetch Code Generator */}
-      <div className="rounded-lg border-2 border-slate-200 dark:border-slate-700 overflow-hidden">
-        <div className="flex items-center justify-between p-5 bg-indigo-50 dark:bg-indigo-950/50 border-b-2 border-indigo-200 dark:border-indigo-800">
-          <h3 className="text-lg font-bold text-indigo-900 dark:text-indigo-200">
+      <div className="rounded-lg border-2 border-border overflow-hidden">
+        <div className="flex items-center justify-between p-5 bg-primary/10 border-b-2 border-primary/30">
+          <h3 className="text-lg font-bold text-foreground">
             Generated Fetch Code
           </h3>
           <button
             onClick={handleCopy}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-base font-bold transition-all"
+            className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg text-base font-bold transition-all"
           >
             <FaCopy size={16} />
             {copied ? "Copied!" : "Copy"}
           </button>
         </div>
         <div className="p-5 bg-slate-900 dark:bg-slate-950">
-          <pre className="text-slate-200 font-mono text-base font-medium overflow-auto max-h-64 whitespace-pre-wrap word-break">
+          <pre className="text-slate-200 font-mono text-base font-medium overflow-auto max-h-64 whitespace-pre-wrap break-words">
             {code}
           </pre>
         </div>

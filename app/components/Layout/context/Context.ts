@@ -3,6 +3,8 @@ import { createContext, useContext } from "react";
 export interface User {
   id: string;
   email: string;
+  name?: string;
+  avatar?: string;
 }
 
 export type ResponseData = {
@@ -26,7 +28,8 @@ export interface ContextType {
   token: string | null;
   loading: boolean;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, remember?: boolean) => Promise<void>;
+  loginWithGoogle: (credential: string) => Promise<void>;
   signup: (email: string, password: string) => Promise<void>;
   logout: () => void;
   responseData: ResponseData | null;

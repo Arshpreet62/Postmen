@@ -49,6 +49,7 @@ export async function POST(req: NextRequest) {
     const newUser = new User({
       email: email.toLowerCase(),
       password: hashedPassword,
+      authProvider: "local",
     });
     await newUser.save();
 

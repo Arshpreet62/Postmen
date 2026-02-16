@@ -3,8 +3,11 @@ import { NextRequest } from "next/server";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-default-secret";
 
-export function signToken(payload: { id: string; email: string }) {
-  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "24h" });
+export function signToken(
+  payload: { id: string; email: string },
+  expiresIn: string = "24h",
+) {
+  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: expiresIn as any });
   return token;
 }
 

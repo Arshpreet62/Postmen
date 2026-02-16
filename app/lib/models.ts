@@ -9,7 +9,21 @@ const UserSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
+    required: false,
+  },
+  authProvider: {
+    type: String,
+    enum: ["local", "google"],
+    default: "local",
+  },
+  googleId: {
+    type: String,
+  },
+  name: {
+    type: String,
+  },
+  avatar: {
+    type: String,
   },
   createdAt: {
     type: Date,

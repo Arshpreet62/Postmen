@@ -24,11 +24,11 @@ export default function Form() {
   const methods = ["GET", "POST", "PUT", "DELETE", "PATCH"];
 
   const methodColors: Record<string, string> = {
-    GET: "bg-blue-500/20 text-blue-600 border-blue-200",
-    POST: "bg-green-500/20 text-green-600 border-green-200",
-    PUT: "bg-yellow-500/20 text-yellow-600 border-yellow-200",
-    DELETE: "bg-red-500/20 text-red-600 border-red-200",
-    PATCH: "bg-purple-500/20 text-purple-600 border-purple-200",
+    GET: "bg-primary/10 text-primary border-primary/30",
+    POST: "bg-accent/10 text-accent border-accent/30",
+    PUT: "bg-amber-400/20 text-amber-600 border-amber-400/40",
+    DELETE: "bg-destructive/10 text-destructive border-destructive/30",
+    PATCH: "bg-fuchsia-400/20 text-fuchsia-600 border-fuchsia-400/40",
   };
 
   const addMoreHeaders = () => {
@@ -126,17 +126,13 @@ export default function Form() {
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Error Alert */}
       {(urlerror || requestError) && (
-        <div className="p-5 rounded-lg bg-red-100 dark:bg-red-900/30 border-2 border-red-400 dark:border-red-600 flex items-start gap-3">
-          <span className="text-red-600 dark:text-red-400 text-2xl mt-1">
-            ⚠️
-          </span>
+        <div className="flex items-start gap-3 rounded-lg border border-destructive/40 bg-destructive/10 p-5 text-destructive">
+          <span className="text-2xl">⚠️</span>
           <div>
-            <p className="text-lg font-bold text-red-800 dark:text-red-300">
+            <p className="text-lg font-bold">
               {urlerror ? "Invalid URL" : "Request Failed"}
             </p>
-            <p className="text-base font-medium text-red-700 dark:text-red-200">
-              {urlerror || requestError}
-            </p>
+            <p className="text-base font-medium">{urlerror || requestError}</p>
           </div>
           <button
             type="button"
@@ -144,7 +140,7 @@ export default function Form() {
               setUrlerror("");
               setRequestError("");
             }}
-            className="ml-auto text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200 text-2xl font-bold"
+            className="ml-auto flex items-center justify-center w-8 h-8 rounded-md border border-destructive/30 bg-destructive/10 text-destructive text-lg font-bold hover:bg-destructive/20 transition-colors"
           >
             ✕
           </button>
@@ -153,14 +149,14 @@ export default function Form() {
 
       {/* URL Input */}
       <div className="space-y-2">
-        <label className="text-base font-bold text-slate-800 dark:text-slate-200">
+        <label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
           Request URL
         </label>
         <input
           type="text"
           value={url}
           placeholder="https://api.example.com/users"
-          className="w-full input-smooth px-5 py-4 text-base font-medium bg-slate-50 dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+          className="w-full rounded-lg border border-input bg-background px-5 py-4 text-base font-medium text-foreground placeholder:text-muted-foreground transition-all focus:outline-none focus:ring-2 focus:ring-ring"
           onChange={(e) => {
             setUrl(e.target.value);
             setUrlerror("");
@@ -172,7 +168,7 @@ export default function Form() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {/* Method Selector */}
         <div className="space-y-2">
-          <label className="text-base font-bold text-slate-800 dark:text-slate-200">
+          <label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Method
           </label>
           <div className="grid grid-cols-2 gap-2">
@@ -181,9 +177,9 @@ export default function Form() {
                 key={m}
                 type="button"
                 onClick={() => setMethod(m)}
-                className={`py-3 px-4 rounded-lg font-bold text-base transition-all border-2 ${
+                className={`rounded-lg border px-4 py-3 text-base font-bold transition-all ${
                   method === m
-                    ? "bg-indigo-600 text-white border-indigo-600 scale-105"
+                    ? "bg-primary text-primary-foreground border-primary shadow-[0_0_18px_rgba(0,255,170,0.35)]"
                     : methodColors[m]
                 }`}
               >
@@ -195,30 +191,30 @@ export default function Form() {
 
         {/* Quick Templates */}
         <div className="md:col-span-3 space-y-2">
-          <label className="text-base font-bold text-slate-800 dark:text-slate-200">
+          <label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Quick Templates
           </label>
-          <div className="grid text-white grid-cols-2 md:grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2 text-foreground md:grid-cols-3">
             <button
               type="button"
               onClick={() =>
                 setUrl("https://jsonplaceholder.typicode.com/posts")
               }
-              className="px-4 py-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200  dark:hover:bg-slate-700 rounded-lg text-base font-bold transition-colors"
+              className="rounded-lg border border-border bg-muted/60 px-4 py-3 text-base font-bold transition-colors hover:bg-muted"
             >
               JSONPlaceholder
             </button>
             <button
               type="button"
               onClick={() => setUrl("https://api.github.com/users/github")}
-              className="px-4 py-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg text-base font-bold transition-colors"
+              className="rounded-lg border border-border bg-muted/60 px-4 py-3 text-base font-bold transition-colors hover:bg-muted"
             >
               GitHub API
             </button>
             <button
               type="button"
               onClick={() => setUrl("")}
-              className="px-4 py-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg text-base font-bold transition-colors"
+              className="rounded-lg border border-border bg-muted/60 px-4 py-3 text-base font-bold transition-colors hover:bg-muted"
             >
               Clear
             </button>
@@ -228,8 +224,8 @@ export default function Form() {
 
       {/* Headers Section */}
       {method !== "GET" && (
-        <div className="space-y-4 p-5 rounded-lg bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-200 dark:border-slate-700">
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <div className="space-y-4 rounded-lg border border-border bg-muted/30 p-5">
+          <h3 className="flex items-center gap-2 text-lg font-bold text-foreground">
             Headers
           </h3>
 
@@ -239,21 +235,21 @@ export default function Form() {
               type="text"
               placeholder="Header name"
               value={headersKey}
-              className="md:col-span-2 input-smooth px-4 py-3 text-base font-medium bg-white dark:bg-slate-700 border-2 border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white placeholder-slate-400"
+              className="md:col-span-2 rounded-lg border border-input bg-background px-4 py-3 text-base font-medium text-foreground placeholder:text-muted-foreground"
               onChange={(e) => setHeadersKey(e.target.value)}
             />
             <input
               type="text"
               placeholder="Header value"
               value={headersValue}
-              className="md:col-span-2 input-smooth px-4 py-3 text-base font-medium bg-white dark:bg-slate-700 border-2 border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white placeholder-slate-400"
+              className="md:col-span-2 rounded-lg border border-input bg-background px-4 py-3 text-base font-medium text-foreground placeholder:text-muted-foreground"
               onChange={(e) => setHeadersValue(e.target.value)}
             />
             <button
               type="button"
               onClick={addMoreHeaders}
               disabled={!headersKey.trim() || !headersValue.trim()}
-              className="px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-base font-bold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-base font-bold text-primary-foreground transition-all hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <FaPlus size={18} />
               <span className="hidden sm:inline">Add</span>
@@ -263,19 +259,19 @@ export default function Form() {
           {/* Headers List */}
           {headers.length > 0 && (
             <div className="space-y-2">
-              <div className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
+              <div className="text-sm font-bold uppercase tracking-wide text-muted-foreground">
                 Added Headers ({headers.length})
               </div>
               {headers.map((header, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-2 p-4 bg-white dark:bg-slate-700 rounded-lg border-2 border-slate-300 dark:border-slate-600"
+                  className="flex items-center gap-2 rounded-lg border border-border/60 bg-card/80 p-4"
                 >
                   <div className="flex-1 min-w-0">
-                    <p className="text-base font-bold text-slate-900 dark:text-white truncate">
+                    <p className="truncate text-base font-bold text-foreground">
                       {header.key}
                     </p>
-                    <p className="text-sm font-medium text-slate-600 dark:text-slate-300 truncate">
+                    <p className="truncate text-sm font-medium text-muted-foreground">
                       {header.value}
                     </p>
                   </div>
@@ -284,7 +280,7 @@ export default function Form() {
                     onClick={() =>
                       setHeaders(headers.filter((_, i) => i !== index))
                     }
-                    className="p-2 hover:bg-red-500/10 text-red-600 dark:text-red-400 rounded-lg transition-colors"
+                    className="rounded-lg p-2 text-destructive transition-colors hover:bg-destructive/10"
                   >
                     <FaTrash size={18} />
                   </button>
@@ -298,12 +294,12 @@ export default function Form() {
       {/* Body Input */}
       {method !== "GET" && (
         <div className="space-y-2">
-          <label className="text-base font-bold text-slate-800 dark:text-slate-200">
+          <label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Request Body (JSON)
           </label>
           <textarea
             placeholder={`{\n  "key": "value",\n  "name": "example"\n}`}
-            className="w-full input-smooth px-5 py-4 text-base font-medium bg-slate-50 dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 font-mono h-32 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500/20 resize-none"
+            className="h-32 w-full resize-none rounded-lg border border-input bg-background px-5 py-4 font-mono text-base font-medium text-foreground placeholder:text-muted-foreground transition-all focus:outline-none focus:ring-2 focus:ring-ring"
             value={body}
             onChange={(e) => setBody(e.target.value)}
           />
@@ -314,7 +310,7 @@ export default function Form() {
       <button
         type="submit"
         disabled={loading || !url}
-        className="w-full btn-gradient py-5 text-white text-xl font-bold rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+        className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-5 text-xl font-bold text-primary-foreground transition-all duration-300 hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {loading ? (
           <>

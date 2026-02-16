@@ -14,6 +14,8 @@ import {
   FaChartBar,
   FaPaperPlane,
 } from "react-icons/fa";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { Button } from "@/components/ui/button";
 
 const Dashboard: React.FC = () => {
   const { user, logout, responseData } = useGlobal();
@@ -41,63 +43,64 @@ const Dashboard: React.FC = () => {
   ] as const;
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-white via-slate-50 to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Top Navigation */}
-      <header className="sticky top-0 z-40 bg-white dark:bg-slate-900 border-b-2 border-slate-300 dark:border-slate-700">
+      <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             {/* Logo & Brand */}
             <Link href="/" className="flex items-center gap-3">
-              <div className="text-4xl font-extrabold bg-linear-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                ⚡ Postmen
+              <div className="text-sm font-semibold uppercase tracking-[0.4em] text-primary">
+                Postmen
               </div>
             </Link>
 
             {/* User Info */}
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4">
               <div className="hidden sm:flex flex-col items-end">
-                <p className="text-base font-bold text-slate-900 dark:text-white">
+                <p className="text-base font-bold text-foreground">
                   {user?.email || "User"}
                 </p>
-                <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                <p className="text-sm font-medium text-muted-foreground">
                   Connected
                 </p>
               </div>
 
+              <ThemeToggle />
+
               {/* Logout Button */}
-              <button
+              <Button
                 onClick={handleLogout}
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 text-base font-bold transition-all duration-300 hover:scale-105"
+                variant="outline"
+                size="sm"
+                className="border-destructive/30 text-destructive hover:bg-destructive/10"
               >
-                <FaSignOutAlt size={20} />
-                <span className="hidden sm:inline">Logout</span>
-              </button>
+                <FaSignOutAlt size={16} />
+                <span className="hidden sm:inline ml-2">Logout</span>
+              </Button>
             </div>
           </div>
         </div>
       </header>
 
       {/* Tab Navigation */}
-      <div className="sticky top-16 z-30 bg-slate-100 dark:bg-slate-800 border-b-2 border-slate-300 dark:border-slate-700">
+      <div className="sticky h-15 top-16 z-30 border-b border-border bg-background/70 backdrop-blur">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex gap-1 overflow-x-auto hide-scrollbar">
+          <div className="flex gap-2  hide-scrollbar">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`py-4 px-6 font-bold text-base flex items-center gap-2 whitespace-nowrap transition-all duration-300 relative ${
+                  className={`py-3 px-6  font-bold text-base flex items-center gap-2 whitespace-nowrap rounded-b-xl transition-all duration-300 ${
                     activeTab === tab.id
-                      ? "text-indigo-600 dark:text-indigo-400"
-                      : "text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100"
+                      ? "text-white dark:text-black bg-emerald-800 dark:bg-white "
+                      : "text-muted-foreground bg-muted/40 hover:bg-muted/60 hover:text-foreground"
                   }`}
                 >
                   <Icon size={20} />
                   {tab.label}
-                  {activeTab === tab.id && (
-                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-linear-to-r from-indigo-600 to-purple-600 rounded-t-full"></div>
-                  )}
                 </button>
               );
             })}
@@ -111,12 +114,9 @@ const Dashboard: React.FC = () => {
           {activeTab === "request" && (
             <div className="space-y-6">
               {/* Request Form Card */}
-              <div className="glass rounded-2xl p-8 shadow-lg border-2 border-slate-300 dark:border-slate-600">
-                <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white mb-6 flex items-center gap-3">
-                  <FaPaperPlane
-                    className="text-indigo-600 dark:text-indigo-400"
-                    size={24}
-                  />
+              <div className="rounded-2xl border border-border/60 bg-card/80 p-8 shadow-lg backdrop-blur">
+                <h2 className="mb-6 flex items-center gap-3 text-3xl font-extrabold text-foreground">
+                  <FaPaperPlane className="text-accent" size={24} />
                   Create API Request
                 </h2>
                 <RequestForm />
@@ -124,8 +124,8 @@ const Dashboard: React.FC = () => {
 
               {/* Response Display Card */}
               {responseData && (
-                <div className="glass rounded-2xl p-8 shadow-lg border-2 border-slate-300 dark:border-slate-600">
-                  <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white mb-6">
+                <div className="rounded-2xl border border-border/60 bg-card/80 p-8 shadow-lg backdrop-blur">
+                  <h2 className="mb-6 text-3xl font-extrabold text-foreground">
                     Response
                   </h2>
                   <ResponseShowcase
@@ -138,12 +138,9 @@ const Dashboard: React.FC = () => {
           )}
 
           {activeTab === "history" && (
-            <div className="glass rounded-2xl p-8 shadow-lg border-2 border-slate-300 dark:border-slate-600">
-              <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white mb-6 flex items-center gap-3">
-                <FaFileAlt
-                  className="text-indigo-600 dark:text-indigo-400"
-                  size={24}
-                />
+            <div className="rounded-2xl border border-border/60 bg-card/80 p-8 shadow-lg backdrop-blur">
+              <h2 className="mb-6 flex items-center gap-3 text-3xl font-extrabold text-foreground">
+                <FaFileAlt className="text-accent" size={24} />
                 Request History
               </h2>
               <RequestHistory />
@@ -152,12 +149,9 @@ const Dashboard: React.FC = () => {
 
           {activeTab === "stats" && (
             <div className="space-y-6">
-              <div className="glass rounded-2xl p-8 shadow-lg border-2 border-slate-300 dark:border-slate-600">
-                <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white mb-6 flex items-center gap-3">
-                  <FaChartBar
-                    className="text-indigo-600 dark:text-indigo-400"
-                    size={24}
-                  />
+              <div className="rounded-2xl border border-border/60 bg-card/80 p-8 shadow-lg backdrop-blur">
+                <h2 className="mb-6 flex items-center gap-3 text-3xl font-extrabold text-foreground">
+                  <FaChartBar className="text-accent" size={24} />
                   Statistics & Analytics
                 </h2>
                 <Statistics />
@@ -168,8 +162,8 @@ const Dashboard: React.FC = () => {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-200 dark:border-slate-800 py-8 px-4 sm:px-6 lg:px-8 mt-16">
-        <div className="max-w-7xl mx-auto text-center text-slate-700 dark:text-slate-300 text-base font-medium">
+      <footer className="mt-16 border-t border-border/60 px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl text-center text-base font-medium text-muted-foreground">
           © 2026 Postmen. Built with ⚡ for API developers.
         </div>
       </footer>

@@ -6,7 +6,7 @@ import { signToken } from "@/app/lib/auth";
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password } = await req.json();
+    const { email, password, remember } = await req.json();
 
     if (!email || !password) {
       return NextResponse.json(
@@ -18,6 +18,13 @@ export async function POST(req: NextRequest) {
     await dbConnect();
 
     const user = await User.findOne({ email: email.toLowerCase() });
+    if (user && !user.password) {
+      return NextResponse.json(
+        { error: "Use Google sign-in for this account." },
+        { status: 400 },
+      );
+    }
+
     const isMatch = user && (await bcrypt.compare(password, user.password));
 
     if (!user || !isMatch) {
@@ -27,10 +34,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const token = signToken({
-      id: user._id.toString(),
-      email: user.email,
-    });
+    const expiresIn = remember ? "30d" : "24h";
+    const token = signToken(
+      {
+        id: user._id.toString(),
+        email: user.email,
+      },
+      expiresIn,
+    );
 
     return NextResponse.json({
       token,
