@@ -330,8 +330,8 @@ const RequestHistory: React.FC = () => {
         <div className="fixed inset-0 rounded-2xl bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="glass rounded-2xl border-2 border-border w-full max-w-6xl max-h-[70vh] overflow-y-auto shadow-2xl">
             {/* Header */}
-            <div className="sticky top-0 flex items-center justify-between p-6 border-b-2 border-border bg-card">
-              <div className="flex items-center gap-4">
+            <div className="sticky top-0 flex flex-row-reverse items-center justify-between p-6 border-b-2 border-border bg-card">
+              {/* <div className="flex items-center gap-4">
                 <span
                   className={`${getMethodColor(selectedRequest.method)} px-4 py-2 rounded-full text-base font-extrabold border-2`}
                 >
@@ -342,7 +342,7 @@ const RequestHistory: React.FC = () => {
                 >
                   {selectedRequest.response.status}
                 </span>
-              </div>
+              </div> */}
               <button
                 onClick={() => setSelectedRequest(null)}
                 className="p-3 border border-border bg-muted/50 hover:bg-muted rounded-lg transition-colors"

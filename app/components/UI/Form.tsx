@@ -4,6 +4,13 @@ import React, { useState } from "react";
 import { useGlobal } from "../Layout/context/Context";
 import { apiUrl } from "../../config/api";
 import { FaPlus, FaTrash, FaCheckCircle } from "react-icons/fa";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function Form() {
   type Header = {
@@ -24,11 +31,11 @@ export default function Form() {
   const methods = ["GET", "POST", "PUT", "DELETE", "PATCH"];
 
   const methodColors: Record<string, string> = {
-    GET: "bg-primary/10 text-primary border-primary/30",
-    POST: "bg-accent/10 text-accent border-accent/30",
-    PUT: "bg-amber-400/20 text-amber-600 border-amber-400/40",
-    DELETE: "bg-destructive/10 text-destructive border-destructive/30",
-    PATCH: "bg-fuchsia-400/20 text-fuchsia-600 border-fuchsia-400/40",
+    GET: "bg-blue-500/10 text-blue-600 border-blue-500/30",
+    POST: "bg-green-500/10 text-green-600 border-green-500/30",
+    PUT: "bg-orange-500/10 text-orange-600 border-orange-500/30",
+    DELETE: "bg-red-500/10 text-red-600 border-red-500/30",
+    PATCH: "bg-purple-500/10 text-purple-600 border-purple-500/30",
   };
 
   const addMoreHeaders = () => {
@@ -171,22 +178,29 @@ export default function Form() {
           <label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Method
           </label>
-          <div className="grid grid-cols-2 gap-2">
-            {methods.map((m) => (
-              <button
-                key={m}
-                type="button"
-                onClick={() => setMethod(m)}
-                className={`rounded-lg border px-4 py-3 text-base font-bold transition-all ${
-                  method === m
-                    ? "bg-primary text-primary-foreground border-primary shadow-[0_0_18px_rgba(0,255,170,0.35)]"
-                    : methodColors[m]
-                }`}
-              >
-                {m}
-              </button>
-            ))}
-          </div>
+          <Select value={method} onValueChange={setMethod}>
+            <SelectTrigger className="h-12 rounded-lg border-input bg-background px-4 text-base font-semibold shadow-sm focus:ring-2 focus:ring-ring/70">
+              <SelectValue
+                placeholder="Select method"
+                className={`inline-flex min-w-18 justify-center rounded-full border px-2.5 py-1 text-xs font-bold ${methodColors[method]}`}
+              />
+            </SelectTrigger>
+            <SelectContent className="rounded-lg border-border/70  bg-white   text-foreground dark:bg-muted dark:text-emerald-800">
+              {methods.map((m) => (
+                <SelectItem
+                  key={m}
+                  value={m}
+                  className="py-2.5 hover:bg-emerald-800/20"
+                >
+                  <span
+                    className={`inline-flex min-w-18 justify-center rounded-full border px-2.5 py-1 text-xs font-bold ${methodColors[m]}`}
+                  >
+                    {m}
+                  </span>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Quick Templates */}
@@ -310,7 +324,7 @@ export default function Form() {
       <button
         type="submit"
         disabled={loading || !url}
-        className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-5 text-xl font-bold text-primary-foreground transition-all duration-300 hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+        className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-800 text-white  py-5 text-xl font-bold text-primary-foreground transition-all duration-300 hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white dark:text-emerald-800"
       >
         {loading ? (
           <>

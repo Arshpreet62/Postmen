@@ -95,7 +95,7 @@ const Dashboard: React.FC = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`py-3 px-6  font-bold text-base flex items-center gap-2 whitespace-nowrap rounded-b-xl transition-all duration-300 ${
                     activeTab === tab.id
-                      ? "text-white dark:text-black bg-emerald-800 dark:bg-white "
+                      ? "text-white dark:text-emerald-800 bg-emerald-800 dark:bg-white "
                       : "text-muted-foreground bg-muted/40 hover:bg-muted/60 hover:text-foreground"
                   }`}
                 >
