@@ -28,14 +28,6 @@ body {
   display: none;
 }
 
-/* Custom Color Palette */
-:root {
-  --color-dark: #2b2723; /* Dark brown/charcoal */
-  --color-light: #f0eefc; /* Light lavender */
-  --color-accent: #eb4520; /* Orange/red accent */
-  --color-text: #000000; /* Black text */
-}
-
 /* Solid backgrounds - custom palette */
 .glass {
   background: #090930;
