@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import mongoose from "mongoose";
 import dbConnect from "@/app/lib/db";
 import { RequestHistory } from "@/app/lib/models";
 import { getAuthFromRequest } from "@/app/lib/auth";
@@ -13,12 +14,16 @@ export async function GET(req: NextRequest, { params }: { params: Params }) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    if (!mongoose.isValidObjectId(id)) {
+      return NextResponse.json({ error: "Request not found" }, { status: 404 });
+    }
+
     await dbConnect();
 
     const request = await RequestHistory.findOne({
       _id: id,
       user: auth.id,
-    });
+    }).lean();
 
     if (!request) {
       return NextResponse.json({ error: "Request not found" }, { status: 404 });
@@ -40,6 +45,10 @@ export async function DELETE(req: NextRequest, { params }: { params: Params }) {
     const auth = getAuthFromRequest(req);
     if (!auth) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!mongoose.isValidObjectId(id)) {
+      return NextResponse.json({ error: "Request not found" }, { status: 404 });
     }
 
     await dbConnect();

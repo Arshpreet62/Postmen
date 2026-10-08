@@ -7,18 +7,18 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Postmen - Modern API Testing Platform",
+    default: "Postmen: send a request, get a postmark",
     template: "%s | Postmen",
   },
   description:
-    "A beautiful, fast, and intuitive API testing tool for modern developers. Test, debug, and optimize your APIs with ease.",
+    "Send an HTTP request from your browser and get the response back with a postmark: status, round-trip time and size. Sign in to keep an outbox.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Postmen - Modern API Testing Platform",
+    title: "Postmen: send a request, get a postmark",
     description:
-      "A beautiful, fast, and intuitive API testing tool for modern developers. Test, debug, and optimize your APIs with ease.",
+      "Send an HTTP request from your browser and get the response back with a postmark: status, round-trip time and size. Sign in to keep an outbox.",
     url: "/",
     siteName: "Postmen",
     type: "website",
@@ -27,15 +27,15 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "Postmen - Modern API Testing Platform",
+        alt: "Postmen: send a request, get a postmark",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Postmen - Modern API Testing Platform",
+    title: "Postmen: send a request, get a postmark",
     description:
-      "A beautiful, fast, and intuitive API testing tool for modern developers.",
+      "Send an HTTP request from your browser and get the response back with a postmark: status, round-trip time and size. Sign in to keep an outbox.",
     images: ["/opengraph-image"],
   },
   icons: {
@@ -55,7 +55,9 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
-                const stored = localStorage.getItem('postmen-theme');
+                document.documentElement.setAttribute('data-js', '');
+                var stored = null;
+                try { stored = localStorage.getItem('postmen-theme'); } catch (e) {}
                 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
                 const theme = stored || (prefersDark ? 'dark' : 'light');
                 if (theme === 'dark') {
@@ -65,15 +67,15 @@ export default function RootLayout({
             `,
           }}
         />
-        <style>{`
-          @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(24px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-          .animate-fadeInUp { animation: fadeInUp 0.7s ease-out forwards; }
-        `}</style>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Recursive:slnt,wght,CASL,MONO@-15..0,300..1000,0..1,0..1&family=Big+Shoulders+Stencil:wght@900&display=swap"
+        />
       </head>
-      <body className="relative min-h-screen bg-background text-foreground transition-colors duration-300">
+      <body>
         <Providers>{children}</Providers>
       </body>
     </html>

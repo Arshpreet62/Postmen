@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Dashboard from "../components/Layout/Dashboard";
 
 export const metadata: Metadata = {
-  title: "Dashboard",
-  description: "Manage and test your API requests in the Postmen dashboard.",
+  title: "Workbench",
+  description: "Build and send API requests, and reopen past ones from your outbox.",
   alternates: { canonical: "/dashboard" },
 };
 

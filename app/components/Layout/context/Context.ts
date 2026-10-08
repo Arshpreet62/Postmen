@@ -7,22 +7,6 @@ export interface User {
   avatar?: string;
 }
 
-export type ResponseData = {
-  request: {
-    url: string;
-    method: string;
-    headers: Record<string, string>;
-    body: string;
-  };
-  response: {
-    status: number;
-    statusText: string;
-    headers: Record<string, string>;
-    body: any;
-  };
-  savedToHistory?: boolean;
-};
-
 export interface ContextType {
   user: User | null;
   token: string | null;
@@ -32,8 +16,6 @@ export interface ContextType {
   loginWithGoogle: (credential: string) => Promise<void>;
   signup: (email: string, password: string) => Promise<void>;
   logout: () => void;
-  responseData: ResponseData | null;
-  setResponseData: (data: ResponseData | null) => void;
   setUser: (user: User | null) => void;
 }
 

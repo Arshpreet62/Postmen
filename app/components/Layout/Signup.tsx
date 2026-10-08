@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Wordmark from "../Mail/Wordmark";
 import { useRouter } from "next/navigation";
 import { useGlobal } from "./context/Context";
 import { FaEye, FaEyeSlash, FaEnvelope, FaLock } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
 import { GoogleLogin } from "@react-oauth/google";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,7 +13,6 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -31,13 +30,13 @@ const Signup: React.FC = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
 
-  const { signup, loginWithGoogle, user, isAuthenticated } = useGlobal();
+  const { signup, loginWithGoogle, user, isAuthenticated, loading: restoring } = useGlobal();
   const router = useRouter();
   const googleEnabled = Boolean(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
 
   useEffect(() => {
-    if (isAuthenticated && user) router.push("/dashboard");
-  }, [isAuthenticated, user, router]);
+    if (!restoring && isAuthenticated && user) router.replace("/dashboard");
+  }, [restoring, isAuthenticated, user, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -46,8 +45,8 @@ const Signup: React.FC = () => {
 
     if (name === "password") {
       let strength = 0;
-      if (value.length >= 6) strength++;
-      if (value.length >= 10) strength++;
+      if (value.length >= 8) strength++;
+      if (value.length >= 12) strength++;
       if (/[A-Z]/.test(value)) strength++;
       if (/[0-9]/.test(value)) strength++;
       if (/[^A-Za-z0-9]/.test(value)) strength++;
@@ -69,8 +68,12 @@ const Signup: React.FC = () => {
       setError("Passwords do not match");
       return false;
     }
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters");
+    if (password.length < 8) {
+      setError("Use at least 8 characters for your password.");
+      return false;
+    }
+    if (new TextEncoder().encode(password).length > 72) {
+      setError("Use at most 72 characters for your password.");
       return false;
     }
     return true;
@@ -83,7 +86,7 @@ const Signup: React.FC = () => {
     setLoading(true);
     try {
       await signup(formData.email.trim().toLowerCase(), formData.password);
-      router.push("/dashboard");
+      router.replace("/dashboard");
     } catch (err: any) {
       console.error(err);
       setError(err?.message || "Signup failed. Try again.");
@@ -101,7 +104,7 @@ const Signup: React.FC = () => {
     setLoading(true);
     try {
       await loginWithGoogle(credential);
-      router.push("/dashboard");
+      router.replace("/dashboard");
     } catch (err: any) {
       setError(err?.message || "Google sign-in failed. Try again.");
     } finally {
@@ -118,30 +121,23 @@ const Signup: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,224,255,0.2),transparent_60%)]" />
-      <div className="absolute -top-24 left-1/2 h-64 w-xl -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(0,255,170,0.24),transparent_60%)] blur-3xl" />
+    <main className="relative min-h-screen overflow-hidden">
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-6xl items-center justify-center px-6 py-16">
-        <Card className="w-full max-w-xl border-border/60 bg-card/80 backdrop-blur">
+        <Card className="w-full max-w-xl border-border/60 bg-card">
           <CardHeader className="space-y-3">
             <div className="flex items-center justify-between">
-              <Link href="/" className="text-lg font-semibold tracking-wide">
-                POSTMEN
-              </Link>
+              <Wordmark />
               <div className="flex items-center gap-3">
-                <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                  New Operator
-                </span>
                 <ThemeToggle />
               </div>
             </div>
             <div className="space-y-2">
-              <CardTitle className="text-3xl">
-                Start your control room.
-              </CardTitle>
+              <h1 className="text-3xl font-bold leading-tight">
+                Keep an outbox
+              </h1>
               <CardDescription className="text-base">
-                Create an account and ship cleaner API runs.
+                Every request you send is saved with its response and postmark, so you can reopen and resend it. Delete any of it whenever you like.
               </CardDescription>
             </div>
           </CardHeader>
@@ -154,13 +150,14 @@ const Signup: React.FC = () => {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                <label htmlFor="email" className="text-sm font-semibold text-foreground">
                   Email address
                 </label>
                 <div className="relative">
                   <FaEnvelope className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     type="email"
+                    id="email"
                     name="email"
                     placeholder="you@example.com"
                     className="pl-10"
@@ -172,13 +169,14 @@ const Signup: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                <label htmlFor="password" className="text-sm font-semibold text-foreground">
                   Password
                 </label>
                 <div className="relative">
                   <FaLock className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     type={showPassword ? "text" : "password"}
+                    id="password"
                     name="password"
                     placeholder="••••••••"
                     className="pl-10 pr-10"
@@ -189,7 +187,7 @@ const Signup: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 grid h-8 w-8 place-items-center text-muted-foreground transition-colors hover:text-foreground"
                     disabled={loading}
                     aria-label={
                       showPassword ? "Hide password" : "Show password"
@@ -216,7 +214,7 @@ const Signup: React.FC = () => {
                         />
                       ))}
                     </div>
-                    <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                    <p className="text-xs text-muted-foreground">
                       {passwordStrength <= 1 && "Weak password"}
                       {passwordStrength === 2 && "Fair password"}
                       {passwordStrength === 3 && "Good password"}
@@ -228,13 +226,14 @@ const Signup: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                <label htmlFor="confirmPassword" className="text-sm font-semibold text-foreground">
                   Confirm password
                 </label>
                 <div className="relative">
                   <FaLock className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     type={showConfirm ? "text" : "password"}
+                    id="confirmPassword"
                     name="confirmPassword"
                     placeholder="••••••••"
                     className="pl-10 pr-10"
@@ -245,7 +244,7 @@ const Signup: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setShowConfirm(!showConfirm)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 grid h-8 w-8 place-items-center text-muted-foreground transition-colors hover:text-foreground"
                     disabled={loading}
                     aria-label={showConfirm ? "Hide password" : "Show password"}
                   >
@@ -258,13 +257,13 @@ const Signup: React.FC = () => {
                 </div>
                 {formData.confirmPassword &&
                   formData.password !== formData.confirmPassword && (
-                    <p className="text-xs uppercase tracking-wide text-destructive">
+                    <p className="text-xs text-destructive">
                       Passwords do not match
                     </p>
                   )}
                 {formData.confirmPassword &&
                   formData.password === formData.confirmPassword && (
-                    <p className="text-xs uppercase tracking-wide text-emerald-600">
+                    <p className="text-xs text-emerald-600">
                       Passwords match
                     </p>
                   )}
@@ -300,7 +299,7 @@ const Signup: React.FC = () => {
               </Button>
             </form>
 
-            <div className="flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-muted-foreground">
+            <div className="flex items-center gap-3 text-sm text-muted-foreground">
               <Separator className="flex-1" />
               or
               <Separator className="flex-1" />
@@ -321,10 +320,9 @@ const Signup: React.FC = () => {
                 />
               </div>
             ) : (
-              <Button variant="outline" disabled className="w-full gap-2">
-                <FcGoogle size={18} />
-                Google sign-in not configured
-              </Button>
+              <p className="text-center text-sm text-foreground">
+                Google sign-in isn&apos;t set up on this server yet.
+              </p>
             )}
           </CardContent>
           <CardContent className="pt-0">
@@ -337,7 +335,7 @@ const Signup: React.FC = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </main>
   );
 };
 

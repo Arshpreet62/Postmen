@@ -4,7 +4,9 @@ import dbConnect from "@/app/lib/db";
 import { User } from "@/app/lib/models";
 import { signToken } from "@/app/lib/auth";
 
-const googleClientId = process.env.GOOGLE_CLIENT_ID;
+// The browser needs NEXT_PUBLIC_GOOGLE_CLIENT_ID anyway; use it here too if
+// the server-only variable isn't set.
+const googleClientId = process.env.GOOGLE_CLIENT_ID || process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 const oauthClient = new OAuth2Client(googleClientId);
 
 export async function POST(req: NextRequest) {
@@ -16,8 +18,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { credential } = await req.json();
-    if (!credential) {
+    const { credential } = await req.json().catch(() => ({}));
+    if (typeof credential !== "string" || !credential) {
       return NextResponse.json(
         { error: "Missing Google credential." },
         { status: 400 },
@@ -30,9 +32,9 @@ export async function POST(req: NextRequest) {
     });
 
     const payload = ticket.getPayload();
-    if (!payload?.email) {
+    if (!payload?.email || payload.email_verified !== true) {
       return NextResponse.json(
-        { error: "Google account email not available." },
+        { error: "Google didn't confirm this account's email address." },
         { status: 400 },
       );
     }
@@ -40,7 +42,17 @@ export async function POST(req: NextRequest) {
     await dbConnect();
 
     const email = payload.email.toLowerCase();
-    let user = await User.findOne({ email });
+    let user = (await User.findOne({ googleId: payload.sub })) ?? (await User.findOne({ email }));
+
+    // An account made with a password is not joined to a Google login by
+    // email alone: anyone can sign up with someone else's address, and would
+    // then share an account with them once they use Google.
+    if (user && !user.googleId && user.password) {
+      return NextResponse.json(
+        { error: "This email already has a Postmen password. Sign in with it instead." },
+        { status: 409 },
+      );
+    }
 
     if (!user) {
       user = new User({

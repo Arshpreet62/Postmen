@@ -4,8 +4,8 @@ import React, { useState, useEffect } from "react";
 import { useGlobal } from "../Layout/context/Context";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Wordmark from "../Mail/Wordmark";
 import { FaEye, FaEyeSlash, FaEnvelope, FaLock } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
 import { GoogleLogin } from "@react-oauth/google";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,14 +13,13 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 const Login: React.FC = () => {
-  const { login, loginWithGoogle, isAuthenticated, user } = useGlobal();
+  const { login, loginWithGoogle, isAuthenticated, user, loading: restoring } = useGlobal();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -30,8 +29,15 @@ const Login: React.FC = () => {
   const googleEnabled = Boolean(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
 
   useEffect(() => {
-    if (isAuthenticated && user) router.push("/dashboard");
-  }, [isAuthenticated, user, router]);
+    if (!restoring && isAuthenticated && user) router.replace("/dashboard");
+  }, [restoring, isAuthenticated, user, router]);
+
+  // Sent here from the dashboard when a saved sign-in has run out.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("expired")) {
+      setError("Your session ended. Sign in again to keep saving to your outbox.");
+    }
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -47,7 +53,7 @@ const Login: React.FC = () => {
     setLoading(true);
     try {
       await login(formData.email, formData.password, rememberMe);
-      router.push("/dashboard");
+      router.replace("/dashboard");
     } catch (err: any) {
       setError(err?.message || "Login failed. Try again.");
     } finally {
@@ -64,7 +70,7 @@ const Login: React.FC = () => {
     setLoading(true);
     try {
       await loginWithGoogle(credential);
-      router.push("/dashboard");
+      router.replace("/dashboard");
     } catch (err: any) {
       setError(err?.message || "Google sign-in failed. Try again.");
     } finally {
@@ -73,30 +79,23 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,224,255,0.2),transparent_60%)]" />
-      <div className="absolute -top-24 left-1/2 h-64 w-xl -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(0,255,170,0.24),transparent_60%)] blur-3xl" />
+    <main className="relative min-h-screen overflow-hidden">
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-6xl items-center justify-center px-6 py-16">
-        <Card className="w-full max-w-xl border-border/60 bg-card/80 backdrop-blur">
+        <Card className="w-full max-w-xl border-border/60 bg-card">
           <CardHeader className="space-y-3">
             <div className="flex items-center justify-between">
-              <Link href="/" className="text-lg font-semibold tracking-wide">
-                POSTMEN
-              </Link>
+              <Wordmark />
               <div className="flex items-center gap-3">
-                <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                  Secure Access
-                </span>
                 <ThemeToggle />
               </div>
             </div>
             <div className="space-y-2">
-              <CardTitle className="text-3xl">
-                Welcome back, operator.
-              </CardTitle>
+              <h1 className="text-3xl font-bold leading-tight">
+                Sign in to your outbox
+              </h1>
               <CardDescription className="text-base">
-                Sign in to monitor and test your API fleets.
+                Your past requests, their responses and postmarks are waiting.
               </CardDescription>
             </div>
           </CardHeader>
@@ -109,13 +108,14 @@ const Login: React.FC = () => {
 
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                <label htmlFor="email" className="text-sm font-semibold text-foreground">
                   Email address
                 </label>
                 <div className="relative">
                   <FaEnvelope className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     type="email"
+                    id="email"
                     name="email"
                     placeholder="you@example.com"
                     className="pl-10"
@@ -128,7 +128,7 @@ const Login: React.FC = () => {
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                  <label htmlFor="password" className="text-sm font-semibold text-foreground">
                     Password
                   </label>
                   <Link
@@ -142,6 +142,7 @@ const Login: React.FC = () => {
                   <FaLock className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     type={showPassword ? "text" : "password"}
+                    id="password"
                     name="password"
                     placeholder="••••••••"
                     className="pl-10 pr-10"
@@ -152,7 +153,7 @@ const Login: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 grid h-8 w-8 place-items-center text-muted-foreground transition-colors hover:text-foreground"
                     disabled={loading}
                     aria-label={
                       showPassword ? "Hide password" : "Show password"
@@ -186,7 +187,7 @@ const Login: React.FC = () => {
               </Button>
             </form>
 
-            <div className="flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-muted-foreground">
+            <div className="flex items-center gap-3 text-sm text-muted-foreground">
               <Separator className="flex-1" />
               or
               <Separator className="flex-1" />
@@ -207,10 +208,9 @@ const Login: React.FC = () => {
                 />
               </div>
             ) : (
-              <Button variant="outline" disabled className="w-full gap-2">
-                <FcGoogle size={18} />
-                Google sign-in not configured
-              </Button>
+              <p className="text-center text-sm text-foreground">
+                Google sign-in isn&apos;t set up on this server yet.
+              </p>
             )}
           </CardContent>
           <CardContent className="pt-0">
@@ -223,7 +223,7 @@ const Login: React.FC = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </main>
   );
 };
 

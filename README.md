@@ -1,21 +1,21 @@
-# ⚡ Postmen - Modern API Testing Platform
+# Postmen
 
-A beautiful, fast, and intuitive API testing platform built with Next.js 15, React 19, and Tailwind CSS. Test, debug, and optimize your APIs with a seamless user experience.
+An API client in the browser, built with Next.js 15, React 19 and MongoDB. Send a request, get the response back with a postmark: status, round-trip time and size.
 
 ![Postmen](https://img.shields.io/badge/Next.js-15.5.12-black?style=flat-square)
 ![React](https://img.shields.io/badge/React-19.1.0-61dafb?style=flat-square)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178c6?style=flat-square)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
-## 🚀 Features
+## Features
 
-- **Lightning Fast** - Sub-100ms response times with optimized performance
-- **Beautiful UI** - Modern glass morphism design with smooth animations
-- **Request History** - Track and manage all your API requests
-- **Statistics** - View detailed metrics about your API usage
-- **Secure** - End-to-end encrypted, we never store your responses
-- **Full-Stack** - Built as a unified Next.js application with integrated backend
-- **JWT Authentication** - Secure user authentication with token-based access
+- **Workbench** - Method and address on one line, request and response side by side, query params synced with the address, Ctrl/Cmd + Enter to send
+- **Postmarks** - Every response is stamped with its status, round-trip time and body size, all measured on the server
+- **Outbox** - Signed-in requests are saved with their full responses; reopen, filter, delete one or all
+- **Statistics** - Counts by method and status code, success rate and median round trip
+- **Accounts** - Email and password (bcrypt) or Google sign-in, JWT sessions
+
+Signed-in requests, response bodies included, are stored in MongoDB until you delete them. Requests sent while signed out are not stored.
 
 ## 🛠️ Tech Stack
 
@@ -69,13 +69,25 @@ npm install
 
 Create a `.env.local` file in the root directory:
 
+Copy `.env.local.example` to `.env.local` and fill it in:
+
 ```env
 # MongoDB Connection
 MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/postman-clone?retryWrites=true&w=majority
 
-# JWT Secret (use a strong random string in production)
-JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+# Required. The server won't sign or accept tokens without it.
+# Generate one with: openssl rand -base64 48
+JWT_SECRET=
+
+# Optional: Google sign-in
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_ID=
+
+# Only on your own machine: lets Postmen call localhost and private networks
+ALLOW_PRIVATE_ADDRESSES=false
 ```
+
+Postmen refuses to send requests to private and internal addresses (localhost, 10.x, 192.168.x, cloud metadata) so a public deployment can't be used to reach them. Set `ALLOW_PRIVATE_ADDRESSES=true` in `.env.local` when you run it locally and want to test your own APIs.
 
 ### 4. Run the Development Server
 
@@ -207,7 +219,9 @@ vercel
 
 Set these in your Vercel dashboard:
 - `MONGO_URI` - Your MongoDB Atlas connection string
-- `JWT_SECRET` - A strong random secret key
+- `JWT_SECRET` - A long random secret (required; at least 32 characters)
+- `NEXT_PUBLIC_GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_ID` - only if you use Google sign-in
+- Leave `ALLOW_PRIVATE_ADDRESSES` unset in production
 
 ## 📖 Usage Guide
 

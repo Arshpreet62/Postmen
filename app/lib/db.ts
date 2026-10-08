@@ -20,6 +20,10 @@ async function dbConnect() {
   if (!cached.mongoose.promise) {
     const opts = {
       bufferCommands: false,
+      // Fail fast when the database is unreachable instead of hanging for 30 s.
+      serverSelectionTimeoutMS: 8000,
+      // Serverless instances each open their own pool; keep it small.
+      maxPoolSize: 10,
     };
 
     cached.mongoose.promise = mongoose

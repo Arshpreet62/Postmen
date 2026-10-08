@@ -4,7 +4,7 @@ import Landing from "./components/Layout/Landing";
 export const metadata: Metadata = {
   title: "Home",
   description:
-    "Postmen is a modern API testing platform with a fast, beautiful UI for developers.",
+    "Send an HTTP request and read the response, headers and round-trip time. Sign in to keep an outbox of every request.",
   alternates: { canonical: "/" },
 };
 

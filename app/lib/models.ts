@@ -45,7 +45,7 @@ const RequestHistorySchema = new mongoose.Schema({
   },
   method: {
     type: String,
-    enum: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    enum: ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"],
     required: true,
   },
   timestamp: {
@@ -61,8 +61,16 @@ const RequestHistorySchema = new mongoose.Schema({
     statusText: String,
     headers: mongoose.Schema.Types.Mixed,
     body: mongoose.Schema.Types.Mixed,
+    // Measured by /api/request: full round trip and bytes received.
+    durationMs: Number,
+    sizeBytes: Number,
+    // True when the body passed the 5 MB limit and was cut off.
+    truncated: Boolean,
   },
 });
+
+// Every outbox query filters by user and sorts newest first.
+RequestHistorySchema.index({ user: 1, timestamp: -1 });
 
 export const RequestHistory =
   mongoose.models.RequestHistory ||

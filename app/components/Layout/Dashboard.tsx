@@ -1,172 +1,130 @@
 "use client";
 
-import React, { useState } from "react";
-import { useGlobal } from "./context/Context";
-import { useRouter } from "next/navigation";
+import React, { useCallback, useState } from "react";
 import Link from "next/link";
-import RequestForm from "../UI/Form";
-import RequestHistory from "../UI/RequestHistory";
-import Statistics from "../UI/Statics";
-import ResponseShowcase from "../UI/ResponseDisplay";
-import {
-  FaSignOutAlt,
-  FaFileAlt,
-  FaChartBar,
-  FaPaperPlane,
-} from "react-icons/fa";
+import { useRouter } from "next/navigation";
+import { useGlobal } from "./context/Context";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { Button } from "@/components/ui/button";
+import Workbench from "../Mail/Workbench";
+import Outbox from "../Mail/Outbox";
+import Tally from "../Mail/Tally";
+import Wordmark from "../Mail/Wordmark";
+import type { Delivery } from "@/app/lib/mail";
+
+type View = "bench" | "tally";
 
 const Dashboard: React.FC = () => {
-  const { user, logout, responseData } = useGlobal();
+  const { user, token, logout } = useGlobal();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"request" | "history" | "stats">(
-    "request",
-  );
+  const [view, setView] = useState<View>("bench");
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [loaded, setLoaded] = useState<Delivery | null>(null);
 
-  const handleLogout = async () => {
-    try {
-      logout();
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      router.push("/");
-    } catch (error) {
-      console.error("Logout failed:", error);
-      router.push("/");
-    }
+  const signOut = () => {
+    logout();
+    router.push("/");
   };
 
-  const tabs = [
-    { id: "request", label: "Make Request", icon: FaPaperPlane },
-    { id: "history", label: "History", icon: FaFileAlt },
-    { id: "stats", label: "Statistics", icon: FaChartBar },
-  ] as const;
+  // The saved sign-in ran out: drop it and ask for a fresh one.
+  const expired = useCallback(() => {
+    logout();
+    router.replace("/login?expired=1");
+  }, [logout, router]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      {/* Top Navigation */}
-      <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            {/* Logo & Brand */}
-            <Link href="/" className="flex items-center gap-3">
-              <div className="text-sm font-semibold uppercase tracking-[0.4em] text-primary">
-                Postmen
-              </div>
-            </Link>
-
-            {/* User Info */}
-            <div className="flex items-center gap-4">
-              <div className="hidden sm:flex flex-col items-end">
-                <p className="text-base font-bold text-foreground">
-                  {user?.email || "User"}
-                </p>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Connected
-                </p>
-              </div>
-
-              <ThemeToggle />
-
-              {/* Logout Button */}
-              <Button
-                onClick={handleLogout}
-                variant="outline"
-                size="sm"
-                className="border-destructive/30 text-destructive hover:bg-destructive/10"
-              >
-                <FaSignOutAlt size={16} />
-                <span className="hidden sm:inline ml-2">Logout</span>
-              </Button>
-            </div>
+    <div style={{ minHeight: "100vh" }}>
+      <a href="#bench" className="skip-link">
+        Skip to the workbench
+      </a>
+      <header className="topbar">
+        <div className="topbar-inner">
+          <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", flexWrap: "wrap" }}>
+            <Wordmark />
+            <nav aria-label="Views" className="tabs">
+              <button type="button" className="tab" aria-current={view === "bench" ? "page" : undefined} onClick={() => setView("bench")}>
+                Workbench
+              </button>
+              <button type="button" className="tab" aria-current={view === "tally" ? "page" : undefined} onClick={() => setView("tally")}>
+                Statistics
+              </button>
+            </nav>
+          </div>
+          <div className="topbar-nav">
+            {user ? (
+              <span className="hint hidden md:inline" title="Signed in">
+                {user.email}
+              </span>
+            ) : (
+              <Link href="/login" className="btn btn-quiet">
+                Sign in
+              </Link>
+            )}
+            <ThemeToggle />
+            {user && (
+              <button type="button" className="btn btn-quiet" onClick={signOut}>
+                Sign out
+              </button>
+            )}
           </div>
         </div>
       </header>
 
-      {/* Tab Navigation */}
-      <div className="sticky h-15 top-16 z-30 border-b border-border bg-background/70 backdrop-blur">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex gap-2 overflow-x-auto hide-scrollbar">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`py-3 px-6  font-bold text-base flex items-center gap-2 whitespace-nowrap rounded-b-xl transition-all duration-300 ${
-                    activeTab === tab.id
-                      ? "text-white dark:text-emerald-800 bg-emerald-800 dark:bg-white "
-                      : "text-muted-foreground bg-muted/40 hover:bg-muted/60 hover:text-foreground"
-                  }`}
-                >
-                  <Icon size={20} />
-                  {tab.label}
-                </button>
-              );
-            })}
+      <main id="bench" className="desk" tabIndex={-1}>
+        {/* The workbench stays mounted while Statistics is open, so switching
+            views never loses an unsent edit or the last response. */}
+        <div className="desk-main" hidden={view !== "bench"}>
+          <h1 className="sr-only">Workbench</h1>
+          <Workbench
+            token={token}
+            initialUrl="https://jsonplaceholder.typicode.com/posts/1"
+            loaded={loaded}
+            persistDraft
+            onSessionExpired={expired}
+            onDelivered={() => {
+              setSelectedId(null);
+              setRefreshKey((k) => k + 1);
+            }}
+          />
+        </div>
+        <aside className="desk-rail" aria-label="Outbox" hidden={view !== "bench"}>
+          {token ? (
+            <Outbox
+              token={token}
+              refreshKey={refreshKey}
+              selectedId={selectedId}
+              onUnauthorized={expired}
+              onSelect={(id, d) => {
+                setSelectedId(id);
+                setLoaded(d);
+              }}
+            />
+          ) : (
+            <div style={{ display: "grid", gap: "0.6rem" }}>
+              <h2 style={{ fontWeight: 800, fontSize: "1.1rem" }}>Outbox</h2>
+              <p className="hint">
+                Requests you send while signed in are kept here with their postmarks, so you can reopen and resend
+                them.
+              </p>
+              <Link href="/signup" className="btn" style={{ justifySelf: "start" }}>
+                Keep an outbox
+              </Link>
+            </div>
+          )}
+        </aside>
+        {view === "tally" && (
+          <div className="desk-wide">
+            <h1 style={{ fontWeight: 850, fontSize: "1.1rem", marginBottom: "1.5rem" }}>Statistics</h1>
+            {token ? (
+              <Tally token={token} refreshKey={refreshKey} onUnauthorized={expired} />
+            ) : (
+              <p className="hint">
+                <Link href="/login">Sign in</Link> to see counts by method and status code for everything you&apos;ve sent.
+              </p>
+            )}
           </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="animate-fadeInUp">
-          {activeTab === "request" && (
-            <div className="space-y-6">
-              {/* Request Form Card */}
-              <div className="rounded-2xl border border-border/60 bg-card/80 p-8 shadow-lg backdrop-blur">
-                <h2 className="mb-6 flex items-center gap-3 text-3xl font-extrabold text-foreground">
-                  <FaPaperPlane className="text-accent" size={24} />
-                  Create API Request
-                </h2>
-                <RequestForm />
-              </div>
-
-              {/* Response Display Card */}
-              {responseData && (
-                <div className="rounded-2xl border border-border/60 bg-card/80 p-8 shadow-lg backdrop-blur">
-                  <h2 className="mb-6 text-3xl font-extrabold text-foreground">
-                    Response
-                  </h2>
-                  <ResponseShowcase
-                    request={responseData.request}
-                    response={responseData.response}
-                  />
-                </div>
-              )}
-            </div>
-          )}
-
-          {activeTab === "history" && (
-            <div className="rounded-2xl border border-border/60 bg-card/80 p-8 shadow-lg backdrop-blur">
-              <h2 className="mb-6 flex items-center gap-3 text-3xl font-extrabold text-foreground">
-                <FaFileAlt className="text-accent" size={24} />
-                Request History
-              </h2>
-              <RequestHistory />
-            </div>
-          )}
-
-          {activeTab === "stats" && (
-            <div className="space-y-6">
-              <div className="rounded-2xl border border-border/60 bg-card/80 p-8 shadow-lg backdrop-blur">
-                <h2 className="mb-6 flex items-center gap-3 text-3xl font-extrabold text-foreground">
-                  <FaChartBar className="text-accent" size={24} />
-                  Statistics & Analytics
-                </h2>
-                <Statistics />
-              </div>
-            </div>
-          )}
-        </div>
+        )}
       </main>
-
-      {/* Footer */}
-      <footer className="mt-16 border-t border-border/60 px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl text-center text-base font-medium text-muted-foreground">
-          © 2026 Postmen. Built with ⚡ for API developers.
-        </div>
-      </footer>
     </div>
   );
 };
